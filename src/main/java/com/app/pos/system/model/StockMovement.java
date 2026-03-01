@@ -1,0 +1,53 @@
+package com.app.pos.system.model;
+
+import com.app.pos.system.model.enums.StockMovementType;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.OffsetDateTime;
+
+@Entity
+@NoArgsConstructor @AllArgsConstructor
+@Data
+@Table(name = "stock_movement")
+public class StockMovement {
+
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long stockId;
+
+    @JoinColumn(name = "store_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    private Store store;
+
+    @JoinColumn(name = "product_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    private Product product;
+
+    @Column(name = "stock_movement_type", nullable = false)
+    @Enumerated(value = EnumType.STRING)
+    private StockMovementType stockMovementType;
+
+    @Column(name = "qty_delta", nullable = false)
+    private Integer qtyDelta;
+
+    @Column(name = "qty_before", nullable = false)
+    private Integer qtyBefore;
+
+    @Column(name = "qty_after", nullable = false)
+    private Integer qtyAfter;
+
+    @Column(name = "reason", length = 500)
+    private String reason;
+
+    @JoinColumn(name = "created_by")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    private User user;
+
+    @Column(name = "created_at", nullable = false, updatable = false, insertable = false)
+    private OffsetDateTime createdAt;
+
+}
