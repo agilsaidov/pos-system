@@ -11,7 +11,7 @@ import java.time.OffsetDateTime;
 @Entity
 @NoArgsConstructor @AllArgsConstructor
 @Data
-@Table(name = "stock_movement")
+@Table(name = "stock_movements")
 public class StockMovement {
 
     @Id
@@ -27,7 +27,7 @@ public class StockMovement {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Product product;
 
-    @Column(name = "stock_movement_type", nullable = false)
+    @Column(name = "type", nullable = false)
     @Enumerated(value = EnumType.STRING)
     private StockMovementType stockMovementType;
 
