@@ -45,7 +45,7 @@ public class Sale {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private SaleStatus status = SaleStatus.COMPLETED;
+    private SaleStatus status = SaleStatus.PENDING;
 
     @Column(name = "created_at", nullable = false, updatable = false, insertable = false)
     private OffsetDateTime createdAt;

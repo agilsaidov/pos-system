@@ -31,4 +31,9 @@ public class Inventory {
 
     @Column(name = "updated_at", nullable = false, insertable = false)
     private OffsetDateTime updatedAt;
+
+    @PreUpdate
+    public void onUpdate(){
+        updatedAt = OffsetDateTime.now();
+    }
 }
