@@ -10,4 +10,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Boolean existsByBarcode(String barcode);
 
+    Optional<Product> getProductByProductId(Long id);
+
 }

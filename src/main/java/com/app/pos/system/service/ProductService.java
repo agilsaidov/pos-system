@@ -36,6 +36,20 @@ public class ProductService {
     }
 
 
+    public ProductResponse updateProduct(Long id, ProductRequest request){
+        Product product = productRepo.getProductByProductId(id)
+                .orElseThrow(() -> new NotFoundException("PRODUCT_NOT_FOUND", "Product with id " + id + " not found"));
+
+        product.setName(request.getName());
+        product.setPrice(request.getPrice());
+        product.setCost(request.getCost());
+        product.setTaxRate(request.getTaxRate());
+        product.setActive(request.getActive());
+
+        return mapToResponse(productRepo.save(product));
+    }
+
+
 
     private Product mapToEntity(ProductRequest request) {
         Product product = new Product();
@@ -57,6 +71,7 @@ public class ProductService {
         response.setCost(product.getCost());
         response.setTaxRate(product.getTaxRate());
         response.setActive(product.getActive());
+        response.setCreatedAt(product.getCreatedAt());
         return response;
     }
 }
