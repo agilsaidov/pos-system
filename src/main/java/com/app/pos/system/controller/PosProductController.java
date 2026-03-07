@@ -1,6 +1,6 @@
 package com.app.pos.system.controller;
 
-import com.app.pos.system.model.Product;
+import com.app.pos.system.dto.response.ProductLookupResponse;
 import com.app.pos.system.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ public class PosProductController {
     private final ProductService productService;
 
     @GetMapping("/lookup")
-    public ResponseEntity<Product> lookup(@RequestParam String barcode){
-        return ResponseEntity.ok().body(productService.getByBarcode(barcode));
+    public ResponseEntity<ProductLookupResponse> lookup(@RequestParam String barcode){
+        return ResponseEntity.ok().body(productService.lookup(barcode));
     }
 }

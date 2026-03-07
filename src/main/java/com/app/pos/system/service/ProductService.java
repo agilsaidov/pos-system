@@ -1,9 +1,11 @@
 package com.app.pos.system.service;
 
 import com.app.pos.system.dto.request.ProductRequest;
+import com.app.pos.system.dto.response.ProductLookupResponse;
 import com.app.pos.system.dto.response.ProductResponse;
 import com.app.pos.system.exception.DuplicateProductException;
 import com.app.pos.system.exception.NotFoundException;
+import com.app.pos.system.mapper.ProductMapper;
 import com.app.pos.system.model.Product;
 import com.app.pos.system.repo.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,13 +16,16 @@ import org.springframework.stereotype.Service;
 public class ProductService {
 
     private final ProductRepository productRepo;
+    private final ProductMapper productMapper;
 
-    public Product getByBarcode(String barcode){
-        return productRepo.findByBarcode(barcode)
+    public ProductLookupResponse lookup(String barcode){
+        Product product = productRepo.findByBarcode(barcode)
                 .orElseThrow(() -> new NotFoundException(
                         "PRODUCT_NOT_FOUND",
                         "No product found with barcode: " + barcode)
                 );
+
+        return productMapper.toLookupResponse(product);
     }
 
     public ProductResponse createProduct(ProductRequest request){
@@ -31,8 +36,8 @@ public class ProductService {
             );
         }
 
-        Product saved = productRepo.save(mapToEntity(request));
-        return mapToResponse(saved);
+        Product saved = productRepo.save(productMapper.toEntity(request));
+        return productMapper.toResponse(saved);
     }
 
 
@@ -46,32 +51,6 @@ public class ProductService {
         product.setTaxRate(request.getTaxRate());
         product.setActive(request.getActive());
 
-        return mapToResponse(productRepo.save(product));
-    }
-
-
-
-    private Product mapToEntity(ProductRequest request) {
-        Product product = new Product();
-        product.setBarcode(request.getBarcode());
-        product.setName(request.getName());
-        product.setPrice(request.getPrice());
-        product.setCost(request.getCost());
-        product.setTaxRate(request.getTaxRate());
-        product.setActive(request.getActive() != null ? request.getActive() : true);
-        return product;
-    }
-
-    private ProductResponse mapToResponse(Product product) {
-        ProductResponse response = new ProductResponse();
-        response.setProductId(product.getProductId());
-        response.setBarcode(product.getBarcode());
-        response.setName(product.getName());
-        response.setPrice(product.getPrice());
-        response.setCost(product.getCost());
-        response.setTaxRate(product.getTaxRate());
-        response.setActive(product.getActive());
-        response.setCreatedAt(product.getCreatedAt());
-        return response;
+        return productMapper.toResponse(product);
     }
 }
