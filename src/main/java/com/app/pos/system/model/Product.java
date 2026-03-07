@@ -2,6 +2,7 @@ package com.app.pos.system.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +12,7 @@ import java.time.OffsetDateTime;
 @Entity
 @Data
 @AllArgsConstructor @NoArgsConstructor
+@Builder
 @Table(name = "products")
 public class Product {
 
