@@ -17,7 +17,7 @@ public class StockMovement {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long stockId;
+    private Long id;
 
     @JoinColumn(name = "store_id")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
