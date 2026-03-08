@@ -9,7 +9,14 @@ import com.app.pos.system.mapper.ProductMapper;
 import com.app.pos.system.model.Product;
 import com.app.pos.system.repo.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -52,5 +59,28 @@ public class ProductService {
         product.setActive(request.getActive());
 
         return productMapper.toResponse(product);
+    }
+
+
+    public Page<ProductResponse> getProducts(String search, String barcode, int page, int size){
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        if(barcode != null && !barcode.isBlank()){
+            Product product = productRepo.findByBarcode(barcode)
+                    .orElseThrow(() -> new NotFoundException("PRODUCT_NOT_FOUND",
+                            "Product with barcode " + barcode + " not found"));
+
+            return new PageImpl<>(List.of(productMapper.toResponse(product)), pageable, 1);
+
+        }
+        else if(search != null && !search.isBlank()){
+            return productRepo.findByNameContainingIgnoreCase(search, pageable)
+                    .map(product -> productMapper.toResponse(product));
+        }
+        else{
+            return productRepo.findAll(pageable)
+                    .map(product -> productMapper.toResponse(product));
+        }
     }
 }
