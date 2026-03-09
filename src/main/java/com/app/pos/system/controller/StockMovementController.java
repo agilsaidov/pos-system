@@ -19,7 +19,7 @@ public class StockMovementController {
 
     private final StockMovementService stockMovementService;
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<Page<StockMovementResponse>> getStockMovements(
             @RequestParam(required = false) Long storeId,
             @RequestParam(required = false) Long productId,

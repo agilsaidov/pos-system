@@ -30,7 +30,7 @@ public class MgmtProductController {
         return ResponseEntity.ok().body(productService.updateProduct(id, request));
     }
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<Page<ProductResponse>> getProducts(
                  @RequestParam(required = false) String search,
                  @RequestParam(required = false) String barcode,
