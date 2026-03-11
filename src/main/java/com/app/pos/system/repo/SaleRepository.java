@@ -1,6 +1,7 @@
 package com.app.pos.system.repo;
 
 import com.app.pos.system.model.Sale;
+import com.app.pos.system.projection.DailyReportProjection;
 import com.app.pos.system.projection.DetailedCashierReportProjection;
 import com.app.pos.system.projection.CashierReportProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -55,4 +57,22 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
                                                       @Param("storeId") Long storeId,
                                                       @Param("from") OffsetDateTime from,
                                                       @Param("to") OffsetDateTime to);
+
+
+    @Query(value = """
+                   SELECT s.id as storeId,
+                          s.name storeName, 
+                          SUM(sa.total) as revenue,
+                          SUM(sa.discount_total) as discountTotal,\s
+                          SUM(sa.tax_total) as taxTotal,
+                          COUNT(sa.id) as salesTotal
+                   FROM stores as s 
+                   JOIN sales sa           
+                   ON s.id = sa.store_id  
+                   WHERE sa.store_id = :storeId
+                         AND DATE(sa.created_at) = DATE(:date)   
+                   GROUP BY s.id, s.name;
+               """,
+            nativeQuery = true)
+    DailyReportProjection getDailyReport(@Param("storeId") Long storeId, @Param("date") LocalDate date);
 }
