@@ -1,8 +1,10 @@
 package com.app.pos.system.service;
 
 import com.app.pos.system.dto.response.CashierDetailsResponse;
+import com.app.pos.system.exception.DuplicateException;
 import com.app.pos.system.exception.NotFoundException;
 import com.app.pos.system.mapper.UserMapper;
+import com.app.pos.system.model.StoreAssignment;
 import com.app.pos.system.model.StoreAssignmentId;
 import com.app.pos.system.repo.StoreAssignmentRepository;
 import com.app.pos.system.repo.StoreRepository;
@@ -46,6 +48,28 @@ public class UserService {
         }
 
         return userMapper.toResponse(storeAssignmentRepository.getByUserIdAndStoreId(userId, storeId));
+
+    }
+
+
+    public void assignCashierToStore(Long cashierId, Long storeId){
+        if(!storeRepository.existsById(storeId)){
+            throw new NotFoundException("STORE_NOT_FOUND", "Store with id " + storeId + " not found");
+        }
+
+        if(!userRepository.existsById(cashierId)){
+            throw new NotFoundException("CASHIER_NOT_FOUND", "Cashier with id " + cashierId + " not found");
+        }
+
+        if (storeAssignmentRepository.existsById(new StoreAssignmentId(cashierId, storeId))) {
+            throw new DuplicateException("ALREADY_ASSIGNED", "Cashier already assigned to this store");
+        }
+
+        StoreAssignment assignment = new StoreAssignment();
+        assignment.setStoreAssignmentId(new StoreAssignmentId(cashierId, storeId));
+        assignment.setUser(userRepository.getReferenceById(cashierId));
+        assignment.setStore(storeRepository.getReferenceById(storeId));
+        storeAssignmentRepository.save(assignment);
 
     }
 }

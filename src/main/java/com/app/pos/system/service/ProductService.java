@@ -3,7 +3,7 @@ package com.app.pos.system.service;
 import com.app.pos.system.dto.request.ProductRequest;
 import com.app.pos.system.dto.response.ProductLookupResponse;
 import com.app.pos.system.dto.response.ProductResponse;
-import com.app.pos.system.exception.DuplicateProductException;
+import com.app.pos.system.exception.DuplicateException;
 import com.app.pos.system.exception.NotFoundException;
 import com.app.pos.system.mapper.ProductMapper;
 import com.app.pos.system.model.Product;
@@ -37,7 +37,8 @@ public class ProductService {
     public ProductResponse createProduct(ProductRequest request){
 
         if(productRepo.existsByBarcode(request.getBarcode())){
-            throw new DuplicateProductException(
+            throw new DuplicateException(
+                    "DUPLICATE_PRODUCT",
                     "Product with barcode " + request.getBarcode() + " already exists"
             );
         }

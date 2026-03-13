@@ -3,6 +3,7 @@ package com.app.pos.system.controller;
 import com.app.pos.system.dto.response.CashierDetailsResponse;
 import com.app.pos.system.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,5 +26,13 @@ public class MgmtUserController {
             @PathVariable Long cashierId,
             @RequestParam(required = true) Long storeId){
         return ResponseEntity.ok().body(userService.getCashier(cashierId, storeId));
+    }
+
+    @PostMapping("/cashiers/{cashierId}/stores/{storeId}")
+    public ResponseEntity<Void> assignToStore(@PathVariable(required = true) Long cashierId,
+                                          @PathVariable(required = true) Long storeId){
+
+        userService.assignCashierToStore(cashierId, storeId);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

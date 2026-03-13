@@ -35,11 +35,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errors);
     }
 
-    @ExceptionHandler(DuplicateProductException.class)
-    public ResponseEntity<ExceptionResponse> handleDuplicateProductException(DuplicateProductException e){
+    @ExceptionHandler(DuplicateException.class)
+    public ResponseEntity<ExceptionResponse> handleDuplicateException(DuplicateException e){
         ExceptionResponse exceptionResponse = new ExceptionResponse(
                 HttpStatus.CONFLICT,
-                "DUPLICATE_PRODUCT",
+                e.getError(),
                 e.getMessage(),
                 LocalDateTime.now()
         );
