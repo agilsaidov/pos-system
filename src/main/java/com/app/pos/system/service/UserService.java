@@ -34,20 +34,21 @@ public class UserService {
                 .toList();
     }
 
-    public CashierDetailsResponse getCashier(Long userId, Long storeId){
+
+    public CashierDetailsResponse getCashier(Long cashierId, Long storeId){
         if(!storeRepository.existsById(storeId)){
             throw new NotFoundException("STORE_NOT_FOUND", "Store with id " + storeId + " not found");
         }
 
-        if(!userRepository.existsById(userId)){
-            throw new NotFoundException("CASHIER_NOT_FOUND", "Cashier with id " + userId + " not found");
+        if(!userRepository.existsById(cashierId)){
+            throw new NotFoundException("CASHIER_NOT_FOUND", "Cashier with id " + cashierId + " not found");
         }
 
-        if(!storeAssignmentRepository.existsById(new StoreAssignmentId(userId, storeId))){
+        if(!storeAssignmentRepository.existsById(new StoreAssignmentId(cashierId, storeId))){
             throw new NotFoundException("CASHIER_NOT_IN_STORE", "Cashier not found in the specified store");
         }
 
-        return userMapper.toResponse(storeAssignmentRepository.getByUserIdAndStoreId(userId, storeId));
+        return userMapper.toResponse(storeAssignmentRepository.getByUserIdAndStoreId(cashierId, storeId));
 
     }
 
@@ -70,6 +71,22 @@ public class UserService {
         assignment.setUser(userRepository.getReferenceById(cashierId));
         assignment.setStore(storeRepository.getReferenceById(storeId));
         storeAssignmentRepository.save(assignment);
+    }
 
+
+    public void unAssignCashierFromStore(Long cashierId, Long storeId){
+        if(!storeRepository.existsById(storeId)){
+            throw new NotFoundException("STORE_NOT_FOUND", "Store with id " + storeId + " not found");
+        }
+
+        if(!userRepository.existsById(cashierId)){
+            throw new NotFoundException("CASHIER_NOT_FOUND", "Cashier with id " + cashierId + " not found");
+        }
+
+        if(!storeAssignmentRepository.existsById(new StoreAssignmentId(cashierId, storeId))){
+            throw new NotFoundException("CASHIER_NOT_IN_STORE", "Cashier not found in the specified store");
+        }
+
+        storeAssignmentRepository.deleteById(new StoreAssignmentId(cashierId, storeId));
     }
 }

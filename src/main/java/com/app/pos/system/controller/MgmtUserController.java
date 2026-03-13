@@ -35,4 +35,13 @@ public class MgmtUserController {
         userService.assignCashierToStore(cashierId, storeId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
+    @DeleteMapping("/cashiers/{cashierId}/stores/{storeId}")
+    public ResponseEntity<Void> unAssignFromStore(@PathVariable(required = true) Long cashierId,
+                                                  @PathVariable(required = true) Long storeId){
+
+        userService.unAssignCashierFromStore(cashierId, storeId);
+        return ResponseEntity.noContent().build();
+    }
+
 }

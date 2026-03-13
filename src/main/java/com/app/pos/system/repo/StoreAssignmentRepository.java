@@ -48,8 +48,8 @@ public interface StoreAssignmentRepository extends JpaRepository<StoreAssignment
         JOIN user_roles ur ON ur.user_id = u.id    
         JOIN roles r ON r.id = ur.role_id
         WHERE sa.store_id = :storeId
-        AND u.id = :userId          
+        AND u.id = :cashierId          
         AND r.name = 'CASHIER'        
         """, nativeQuery = true)
-    CashierDetailsProjection getByUserIdAndStoreId(@Param("userId") Long userId, @Param("storeId") Long storeId);
+    CashierDetailsProjection getByUserIdAndStoreId(@Param("cashierId") Long cashierId, @Param("storeId") Long storeId);
 }
