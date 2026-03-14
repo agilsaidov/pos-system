@@ -3,14 +3,19 @@ package com.app.pos.system.model;
 import com.app.pos.system.model.enums.StockMovementType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.type.PostgreSQLEnumJdbcType;
 
 import java.time.OffsetDateTime;
 
 @Entity
 @NoArgsConstructor @AllArgsConstructor
 @Data
+@Builder
 @Table(name = "stock_movements")
 public class StockMovement {
 
@@ -27,8 +32,8 @@ public class StockMovement {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Product product;
 
-    @Column(name = "type", nullable = false)
-    @Enumerated(value = EnumType.STRING)
+    @Column(name = "type", nullable = false, columnDefinition = "stock_movement_type")
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     private StockMovementType stockMovementType;
 
     @Column(name = "qty_delta", nullable = false)
@@ -48,6 +53,7 @@ public class StockMovement {
     private User user;
 
     @Column(name = "created_at", nullable = false, updatable = false, insertable = false)
+    @CreationTimestamp
     private OffsetDateTime createdAt;
 
 }

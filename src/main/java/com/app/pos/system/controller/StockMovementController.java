@@ -1,14 +1,14 @@
 package com.app.pos.system.controller;
 
+import com.app.pos.system.dto.request.StockMovementRequest;
 import com.app.pos.system.dto.response.StockMovementResponse;
 import com.app.pos.system.service.StockMovementService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.OffsetDateTime;
 
@@ -30,5 +30,12 @@ public class StockMovementController {
 
         return ResponseEntity.ok().body(stockMovementService.getStockMovement(storeId, productId, from, to, page, size));
 
+    }
+
+    @PostMapping
+    public ResponseEntity<StockMovementResponse> createStockMovement(
+            @RequestBody @Valid StockMovementRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(stockMovementService.createStockMovement(request));
     }
 }
