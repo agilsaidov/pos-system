@@ -40,4 +40,12 @@ public class MgmtProductController {
 
         return ResponseEntity.ok().body(productService.getProducts(search, barcode, page, size));
     }
+
+    @PatchMapping("/{id}/active")
+    public ResponseEntity<Void> toggleProductActive(@PathVariable Long id,
+                                                    @RequestParam("active") Boolean active){
+
+        productService.toggleProductActive(id, active);
+        return ResponseEntity.noContent().build();
+    }
 }

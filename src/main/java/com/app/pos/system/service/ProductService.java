@@ -83,4 +83,17 @@ public class ProductService {
                     .map(product -> productMapper.toResponse(product));
         }
     }
+
+
+    public void toggleProductActive(Long productId, Boolean active){
+
+        Product product = productRepo.findById(productId)
+                .orElseThrow(() -> new NotFoundException(
+                        "PRODUCT_NOT_FOUND",
+                        "Product with id " + productId + " not found")
+                );
+
+        product.setActive(active);
+        productRepo.save(product);
+    }
 }
