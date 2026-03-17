@@ -19,12 +19,13 @@ public class InventoryController {
 
     @GetMapping
     public ResponseEntity<Page<InventoryResponse>> getInventory(
+            @RequestParam(required = true) Long managerId,
             @RequestParam(required = true) Long storeId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ){
 
-        return ResponseEntity.ok().body(inventoryService.getInventory(storeId, page, size));
+        return ResponseEntity.ok().body(inventoryService.getInventory(managerId, storeId, page, size));
     }
 
 }
