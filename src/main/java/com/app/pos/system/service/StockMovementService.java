@@ -2,6 +2,7 @@ package com.app.pos.system.service;
 
 import com.app.pos.system.dto.request.StockMovementRequest;
 import com.app.pos.system.dto.response.StockMovementResponse;
+import com.app.pos.system.exception.AccessDeniedException;
 import com.app.pos.system.exception.BadRequestException;
 import com.app.pos.system.exception.NotFoundException;
 import com.app.pos.system.mapper.StockMovementMapper;
@@ -66,8 +67,7 @@ public class StockMovementService {
 
         if (!storeAssignmentRepository.existsById(
                 new StoreAssignmentId(request.getManagerId(), request.getStoreId()))) {
-            throw new NotFoundException("MANAGER_NOT_IN_STORE",
-                    "Manager doesn't work at this store");
+            throw new AccessDeniedException("Access denied for manager with id: " + request.getManagerId());
         }
 
         Inventory inventory = inventoryRepository
