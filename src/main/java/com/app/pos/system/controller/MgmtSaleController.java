@@ -27,7 +27,7 @@ public class MgmtSaleController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size){
 
-        return ResponseEntity.ok().body(salesService.getSales(managerId, saleId, cashierId, storeId, from, to, page, size));
+        return ResponseEntity.ok().body(salesService.getSalesForManager(managerId, saleId, cashierId, storeId, from, to, page, size));
 
     }
 }
