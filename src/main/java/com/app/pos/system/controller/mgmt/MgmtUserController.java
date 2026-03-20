@@ -1,4 +1,4 @@
-package com.app.pos.system.controller;
+package com.app.pos.system.controller.mgmt;
 
 import com.app.pos.system.dto.response.CashierDetailsResponse;
 import com.app.pos.system.service.UserService;

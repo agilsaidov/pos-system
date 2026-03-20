@@ -1,4 +1,4 @@
-package com.app.pos.system.controller;
+package com.app.pos.system.controller.pos;
 
 import com.app.pos.system.dto.response.ProductLookupResponse;
 import com.app.pos.system.service.ProductService;
