@@ -30,7 +30,7 @@ public class UserService {
         }
 
         return storeAssignmentRepository.findAllByStoreId(storeId)
-                .stream().map(userMapper::toResponse)
+                .stream().map(userMapper::toCashierDetailsResponse)
                 .toList();
     }
 
@@ -48,7 +48,7 @@ public class UserService {
             throw new NotFoundException("CASHIER_NOT_IN_STORE", "Cashier not found in the specified store");
         }
 
-        return userMapper.toResponse(storeAssignmentRepository.getByUserIdAndStoreId(cashierId, storeId));
+        return userMapper.toCashierDetailsResponse(storeAssignmentRepository.getByUserIdAndStoreId(cashierId, storeId));
 
     }
 
