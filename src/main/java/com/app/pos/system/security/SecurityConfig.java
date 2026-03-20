@@ -1,4 +1,4 @@
-package com.app.pos.system.config;
+package com.app.pos.system.security;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

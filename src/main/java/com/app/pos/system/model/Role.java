@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.type.PostgreSQLEnumJdbcType;
 
 @Entity
 @Data
@@ -18,6 +20,6 @@ public class Role {
     private Short roleId;
 
     @Column(name = "name", nullable = false)
-    @Enumerated(value = EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     private RoleName roleName;
 }

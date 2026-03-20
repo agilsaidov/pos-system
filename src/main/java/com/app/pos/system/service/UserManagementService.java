@@ -2,10 +2,15 @@ package com.app.pos.system.service;
 
 import com.app.pos.system.dto.request.CreateUserRequest;
 import com.app.pos.system.dto.response.UserResponse;
-import com.app.pos.system.exception.DuplicateException;
+import com.app.pos.system.exception.NotFoundException;
 import com.app.pos.system.mapper.UserMapper;
+import com.app.pos.system.model.Role;
 import com.app.pos.system.model.User;
+import com.app.pos.system.model.UserRole;
+import com.app.pos.system.model.UserRoleId;
+import com.app.pos.system.repo.RoleRepository;
 import com.app.pos.system.repo.UserRepository;
+import com.app.pos.system.repo.UserRoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +21,8 @@ import java.util.UUID;
 public class UserManagementService {
 
     private final UserRepository userRepository;
+    private final UserRoleRepository userRoleRepository;
+    private final RoleRepository roleRepository;
     private final KeycloakService keycloakService;
     private final UserMapper userMapper;
 
@@ -30,11 +37,23 @@ public class UserManagementService {
             user.setFullName(request.getFirstName() + " " + request.getLastName());
             user.setEnabled(true);
 
-            return userMapper.toUserResponse(userRepository.save(user));
+            User savedUser = userRepository.save(user);
+
+            Role role = roleRepository.findByRoleName(request.getRole())
+                    .orElseThrow(() -> new NotFoundException("ROLE_NOT_FOUND", "Role not found"));
+
+            UserRole userRole = new UserRole();
+
+            userRole.setUserRoleId(new UserRoleId(savedUser.getUserId(), role.getRoleId()));
+            userRole.setUser(savedUser);
+            userRole.setRole(role);
+            userRoleRepository.save(userRole);
+
+            return userMapper.toUserResponse(savedUser);
 
         }catch (RuntimeException e){
             keycloakService.deleteUser(keycloakId.toString());
-            throw new RuntimeException("Failed to create user");
+            throw new RuntimeException("Failed to create user", e);
         }
     }
 
