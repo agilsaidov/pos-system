@@ -31,6 +31,11 @@ public class User {
     @Column(name = "enabled", nullable = false)
     private Boolean enabled = true;
 
-    @Column(name = "created_at", updatable = false, insertable = false)
+    @Column(name = "created_at", updatable = false)
     private OffsetDateTime createdAt;
+
+    @PrePersist
+    public void onCreate() {
+        createdAt = OffsetDateTime.now();
+    }
 }
