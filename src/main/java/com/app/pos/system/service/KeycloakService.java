@@ -6,6 +6,7 @@ import com.app.pos.system.model.enums.RoleName;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
@@ -53,6 +54,14 @@ public class KeycloakService {
 
     public void deleteUser(String keycloakId){
         usersResource.get(keycloakId).remove();
+    }
+
+
+    public void enableUser(String keycloakId, Boolean enable){
+        UserResource userResource = usersResource.get(keycloakId);
+        UserRepresentation user = userResource.toRepresentation();
+        user.setEnabled(enable);
+        userResource.update(user);
     }
 
 

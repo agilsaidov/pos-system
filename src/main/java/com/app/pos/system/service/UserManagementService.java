@@ -2,12 +2,14 @@ package com.app.pos.system.service;
 
 import com.app.pos.system.dto.request.CreateUserRequest;
 import com.app.pos.system.dto.response.UserResponse;
+import com.app.pos.system.exception.BadRequestException;
 import com.app.pos.system.exception.NotFoundException;
 import com.app.pos.system.mapper.UserMapper;
 import com.app.pos.system.model.Role;
 import com.app.pos.system.model.User;
 import com.app.pos.system.model.UserRole;
 import com.app.pos.system.model.UserRoleId;
+import com.app.pos.system.model.enums.RoleName;
 import com.app.pos.system.repo.RoleRepository;
 import com.app.pos.system.repo.UserRepository;
 import com.app.pos.system.repo.UserRoleRepository;
@@ -55,6 +57,23 @@ public class UserManagementService {
             keycloakService.deleteUser(keycloakId.toString());
             throw new RuntimeException("Failed to create user", e);
         }
+    }
+
+    public void disableUser(Long userId, Boolean enable){
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND", "User with id " + userId + " not found"));
+
+        UserRole userRole = userRoleRepository.findByUser_UserId(userId)
+                .orElseThrow(() -> new NotFoundException("ROLE_NOT_FOUND", "User has no role assigned"));
+
+        if(userRole.getRole().getRoleName().equals(RoleName.ADMIN)){
+            throw new BadRequestException("CANNOT_DISABLE_ADMIN", "Cannot disable an admin user");        }
+
+        keycloakService.enableUser(user.getKeycloakId().toString(), enable);
+
+        user.setEnabled(enable);
+        userRepository.save(user);
     }
 
 }
