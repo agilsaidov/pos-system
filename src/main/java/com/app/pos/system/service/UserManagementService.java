@@ -3,6 +3,7 @@ package com.app.pos.system.service;
 import com.app.pos.system.dto.request.CreateUserRequest;
 import com.app.pos.system.dto.response.UserResponse;
 import com.app.pos.system.exception.BadRequestException;
+import com.app.pos.system.exception.ForbiddenException;
 import com.app.pos.system.exception.NotFoundException;
 import com.app.pos.system.mapper.UserMapper;
 import com.app.pos.system.model.Role;
@@ -83,11 +84,11 @@ public class UserManagementService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND", "User with id " + userId + " not found"));
 
-        UserRole userRole = userRoleRepository.findByUser_UserId(userId)
-                .orElseThrow(() -> new NotFoundException("ROLE_NOT_FOUND", "User has no role assigned"));
+        boolean isAdmin = user.getUserRoles().stream().anyMatch(ur -> ur.getRole().getRoleName().equals(RoleName.ADMIN));
 
-        if(userRole.getRole().getRoleName().equals(RoleName.ADMIN)){
-            throw new BadRequestException("CANNOT_DISABLE_ADMIN", "Cannot disable an admin user");        }
+        if(isAdmin){
+            throw new ForbiddenException("CANNOT_DISABLE_ADMIN", "Cannot disable an admin user");
+        }
 
         keycloakService.enableUser(user.getKeycloakId().toString(), enable);
 
