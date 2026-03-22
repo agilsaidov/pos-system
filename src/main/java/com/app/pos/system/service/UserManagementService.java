@@ -13,7 +13,11 @@ import com.app.pos.system.model.enums.RoleName;
 import com.app.pos.system.repo.RoleRepository;
 import com.app.pos.system.repo.UserRepository;
 import com.app.pos.system.repo.UserRoleRepository;
+import com.app.pos.system.specification.UserSpec;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -58,6 +62,21 @@ public class UserManagementService {
             throw new RuntimeException("Failed to create user", e);
         }
     }
+
+
+    public Page<UserResponse> getUsers(Long userId, String search, RoleName role, Boolean enabled, int page, int size){
+
+        if (role == RoleName.ADMIN) {
+            throw new BadRequestException("INVALID_ROLE_FILTER", "Cannot filter users by ADMIN role");
+        }
+
+        Pageable pageable = PageRequest.of(page,size);
+
+        return userRepository.findAll(UserSpec.withFilters(userId, search, role, enabled), pageable)
+                .map(userMapper::toUserResponse);
+
+    }
+
 
     public void disableUser(Long userId, Boolean enable){
 

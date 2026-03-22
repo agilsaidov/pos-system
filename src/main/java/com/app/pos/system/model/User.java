@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -27,6 +29,9 @@ public class User {
 
     @Column(name = "full_name", nullable = false)
     private String fullName;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<UserRole> userRoles = new ArrayList<>();
 
     @Column(name = "enabled", nullable = false)
     private Boolean enabled = true;
