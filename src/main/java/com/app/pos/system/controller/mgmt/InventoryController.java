@@ -19,8 +19,8 @@ public class InventoryController {
 
     @GetMapping
     public ResponseEntity<Page<InventoryResponse>> getInventory(
-            @RequestParam(required = true) Long managerId,
-            @RequestParam(required = true) Long storeId,
+            @RequestParam Long managerId,
+            @RequestParam Long storeId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ){

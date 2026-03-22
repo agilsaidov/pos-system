@@ -37,7 +37,7 @@ public class AdminUserController {
 
     @PatchMapping("/{id}/enable")
     public ResponseEntity<Void> disableUser(@PathVariable(name = "id") Long userId,
-                                            @RequestParam(required = true) Boolean enabled){
+                                            @RequestParam Boolean enabled){
         userManagementService.disableUser(userId, enabled);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

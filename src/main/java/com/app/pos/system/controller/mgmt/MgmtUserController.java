@@ -17,7 +17,7 @@ public class MgmtUserController {
     private final UserService userService;
 
     @GetMapping("/cashiers")
-    public ResponseEntity<List<CashierDetailsResponse>> getCashiers(@RequestParam(required = true) Long storeId){
+    public ResponseEntity<List<CashierDetailsResponse>> getCashiers(@RequestParam Long storeId){
         return ResponseEntity.ok().body(userService.getCashiers(storeId));
     }
 
@@ -29,16 +29,16 @@ public class MgmtUserController {
     }
 
     @PostMapping("/cashiers/{cashierId}/stores/{storeId}")
-    public ResponseEntity<Void> assignToStore(@PathVariable(required = true) Long cashierId,
-                                          @PathVariable(required = true) Long storeId){
+    public ResponseEntity<Void> assignToStore(@PathVariable Long cashierId,
+                                          @PathVariable Long storeId){
 
         userService.assignCashierToStore(cashierId, storeId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @DeleteMapping("/cashiers/{cashierId}/stores/{storeId}")
-    public ResponseEntity<Void> unAssignFromStore(@PathVariable(required = true) Long cashierId,
-                                                  @PathVariable(required = true) Long storeId){
+    public ResponseEntity<Void> unAssignFromStore(@PathVariable Long cashierId,
+                                                  @PathVariable Long storeId){
 
         userService.unAssignCashierFromStore(cashierId, storeId);
         return ResponseEntity.noContent().build();

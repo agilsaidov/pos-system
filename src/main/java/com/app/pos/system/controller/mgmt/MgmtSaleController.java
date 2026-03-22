@@ -18,10 +18,10 @@ public class MgmtSaleController {
 
     @GetMapping
     public ResponseEntity<Page<SaleResponse>> getSales(
-            @RequestParam(required = true) Long managerId,
+            @RequestParam Long managerId,
             @RequestParam(required = false) Long saleId,
             @RequestParam(required = false) Long cashierId,
-            @RequestParam(required = true) Long storeId,
+            @RequestParam Long storeId,
             @RequestParam(required = false) OffsetDateTime from,
             @RequestParam(required = false) OffsetDateTime to,
             @RequestParam(defaultValue = "0") int page,

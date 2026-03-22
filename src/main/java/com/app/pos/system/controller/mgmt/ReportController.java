@@ -21,7 +21,7 @@ public class ReportController {
 
     @GetMapping("/cashiers")
     public ResponseEntity<List<CashierReportResponse>> getReports(
-            @RequestParam(required = true) Long storeId,
+            @RequestParam Long storeId,
             @RequestParam(required = false) OffsetDateTime from,
             @RequestParam(required = false) OffsetDateTime to
             ){
@@ -31,7 +31,7 @@ public class ReportController {
 
     @GetMapping("/cashiers/{cashierId}")
     public ResponseEntity<DetailedCashierReportResponse> getDetailedReport(@PathVariable Long cashierId,
-                                                                           @RequestParam(required = true) Long storeId,
+                                                                           @RequestParam Long storeId,
                                                                            @RequestParam(required = false) OffsetDateTime from,
                                                                            @RequestParam(required = false) OffsetDateTime to){
 
@@ -39,8 +39,8 @@ public class ReportController {
     }
 
     @GetMapping("/daily")
-    public ResponseEntity<DailyReportResponse> getDailyReport(@RequestParam(required = true) Long storeId,
-                                                              @RequestParam(required =  true) LocalDate date){
+    public ResponseEntity<DailyReportResponse> getDailyReport(@RequestParam Long storeId,
+                                                              @RequestParam LocalDate date){
 
         return ResponseEntity.ok().body(reportService.getDailyReport(storeId, date));
     }
