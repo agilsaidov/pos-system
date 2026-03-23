@@ -43,7 +43,8 @@ public class UserManagementService {
             User user = new User();
             user.setKeycloakId(keycloakId);
             user.setUsername(request.getUsername());
-            user.setFullName(request.getFirstName() + " " + request.getLastName());
+            user.setFirstName(request.getFirstName());
+            user.setLastName(request.getLastName());
             user.setEnabled(true);
 
             User savedUser = userRepository.save(user);
@@ -117,7 +118,8 @@ public class UserManagementService {
 
         try {
             user.setUsername(request.getUsername());
-            user.setFullName(request.getFirstName() + " " + request.getLastName());
+            user.setFirstName(request.getFirstName());
+            user.setLastName(request.getLastName());
             return userMapper.toUserResponse(userRepository.save(user));
 
         }catch (RuntimeException e){
@@ -129,10 +131,9 @@ public class UserManagementService {
     private void rollbackKeycloakUpdate(User originalUser){
         UpdateUserRequest rollback = new UpdateUserRequest();
         rollback.setUsername(originalUser.getUsername());
+        rollback.setFirstName(originalUser.getFirstName());
+        rollback.setLastName(originalUser.getLastName());
 
-        String[] nameParts = originalUser.getFullName().split(" ", 2);
-        rollback.setFirstName(nameParts[0]);
-        rollback.setLastName(nameParts.length > 1 ? nameParts[1] : "");
         keycloakService.updateUser(originalUser.getKeycloakId().toString(), rollback);
     }
 

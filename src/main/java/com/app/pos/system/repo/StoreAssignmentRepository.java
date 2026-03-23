@@ -16,7 +16,8 @@ public interface StoreAssignmentRepository extends JpaRepository<StoreAssignment
     @Query(value = """
         SELECT u.id userId,
               u.username username,
-              u.full_name fullName,
+              u.first_name firstName,
+              u.last_name lastName,
               u.enabled enabled,
               u.created_at createdAt,
               s.id storeId,
@@ -36,7 +37,8 @@ public interface StoreAssignmentRepository extends JpaRepository<StoreAssignment
     @Query(value = """
         SELECT u.id userId,
               u.username username,
-              u.full_name fullName,
+              u.first_name firstName,
+              u.last_name lastName,
               u.enabled enabled,
               u.created_at createdAt,
               s.id storeId,

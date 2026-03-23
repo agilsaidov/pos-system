@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.Value;
 
 @Data
 public class CreateUserRequest {
@@ -31,7 +30,7 @@ public class CreateUserRequest {
 
     @NotNull(message = "Field 'password' is required")
     @Size(max = 30, min = 6, message = "Password must be between 6 and 30 elements")
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\\\d)(?=.*[^a-zA-Z\\\\d]).+$",
-             message = "Password must have symbol/upper/lower-case letters and digit")
+/*    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\\\d)(?=.*[^a-zA-Z\\\\d]).+$",
+             message = "Password must have symbol/upper/lower-case letters and digit")*/
     private String password;
 }

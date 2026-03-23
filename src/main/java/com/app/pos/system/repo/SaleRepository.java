@@ -21,7 +21,8 @@ import java.util.List;
 public interface SaleRepository extends JpaRepository<Sale, Long>, JpaSpecificationExecutor<Sale> {
     @Query(value = """
                     SELECT u.id as cashierId,\s
-                           u.full_name as cashierName,\s
+                           u.first_name as firstName,\s
+                           u.last_name as lastName,\s
                            COUNT(s.id) saleCount,\s
                            SUM(s.total) as revenue,\s
                            SUM(s.discount_total) as discountTotal,\s
@@ -32,7 +33,7 @@ public interface SaleRepository extends JpaRepository<Sale, Long>, JpaSpecificat
                     WHERE s.store_id = :storeId
                     AND s.created_at >= :from
                     AND s.created_at <= :to
-                    GROUP BY u.id, u.full_name""",
+                    GROUP BY u.id, u.first_name, u.last_name""",
             nativeQuery = true)
     List<CashierReportProjection> getReports(@Param("storeId") Long storeId,
                                              @Param("from") OffsetDateTime from,
@@ -41,8 +42,8 @@ public interface SaleRepository extends JpaRepository<Sale, Long>, JpaSpecificat
 
     @Query(value = """
                     SELECT u.id as cashierId,\s
-                           u.full_name as cashierName,\s
-                           COUNT(s.id) saleCount,\s
+                           u.first_name as firstName,\s
+                           u.last_name as lastName,\s                           COUNT(s.id) saleCount,\s
                            SUM(s.total) as revenue,\s
                            SUM(s.discount_total) as discountTotal,\s
                            SUM(s.tax_total) as taxTotal,
@@ -54,7 +55,7 @@ public interface SaleRepository extends JpaRepository<Sale, Long>, JpaSpecificat
                     AND s.store_id = :storeId
                     AND s.created_at >= :from
                     AND s.created_at <= :to
-                    GROUP BY u.id, u.full_name;              
+                    GROUP BY u.id, u.first_name, u.last_name;              
                     """,
             nativeQuery = true)
     DetailedCashierReportProjection getDetailedReport(@Param("cashierId") Long cashierId,

@@ -10,7 +10,8 @@ import java.math.BigDecimal;
 @AllArgsConstructor @NoArgsConstructor
 public class CashierReportResponse {
     private Long cashierId;
-    private String cashierName;
+    private String firstName;
+    private String lastName;
     private Long saleCount;
     private BigDecimal revenue;
     private BigDecimal discountTotal;

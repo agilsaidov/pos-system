@@ -10,7 +10,8 @@ public interface SaleMapper {
     @Mapping(source = "store.storeId", target = "storeId")
     @Mapping(source = "store.name", target = "storeName")
     @Mapping(source = "cashier.userId", target = "cashierId")
-    @Mapping(source = "cashier.fullName", target = "cashierName")
+    @Mapping(source = "cashier.firstName", target = "firstName")
+    @Mapping(source = "cashier.lastName", target = "lastName")
     @Mapping(source = "createdAt", target = "issueDate")
     SaleResponse toResponse(Sale sale);
 }

@@ -10,7 +10,8 @@ import java.util.List;
 public class UserResponse {
     private String userId;
     private String username;
-    private String fullName;
+    private String firstName;
+    private String lastName;
     private Boolean enabled;
     private List<RoleName> roles;
     private OffsetDateTime createdAt;

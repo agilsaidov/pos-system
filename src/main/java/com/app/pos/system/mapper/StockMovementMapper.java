@@ -10,7 +10,8 @@ public interface StockMovementMapper {
     @Mapping(source = "store.name", target = "storeName")
     @Mapping(source = "product.name", target = "productName")
     @Mapping(source = "product.barcode", target = "productBarcode")
-    @Mapping(source = "user.fullName", target = "createdBy")
+    @Mapping(source = "user.firstName", target = "firstName")
+    @Mapping(source = "user.lastName", target = "lastName")
     @Mapping(source = "stockMovementType", target = "type")
     StockMovementResponse toResponse(StockMovement movement);
 }

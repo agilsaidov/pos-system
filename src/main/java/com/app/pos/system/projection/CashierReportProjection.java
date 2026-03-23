@@ -4,7 +4,8 @@ import java.math.BigDecimal;
 
 public interface CashierReportProjection {
     Long getCashierId();
-    String getCashierName();
+    String getFirstName();
+    String getLastName();
     Long getSaleCount();
     BigDecimal getRevenue();
     BigDecimal getDiscountTotal();

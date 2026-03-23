@@ -8,7 +8,8 @@ import java.time.OffsetDateTime;
 @Data
 public class SaleResponse {
     private Long cashierId;
-    private String cashierName;
+    private String firstName;
+    private String lastName;
     private Long storeId;
     private String storeName;
     private BigDecimal total;

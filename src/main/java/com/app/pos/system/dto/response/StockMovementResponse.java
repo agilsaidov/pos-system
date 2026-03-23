@@ -16,6 +16,7 @@ public class StockMovementResponse {
     private Integer qtyBefore;
     private Integer qtyAfter;
     private String reason;
-    private String createdBy;
+    private String firstName;
+    private String lastName;
     private OffsetDateTime createdAt;
 }
