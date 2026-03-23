@@ -1,6 +1,7 @@
 package com.app.pos.system.service;
 
 import com.app.pos.system.dto.request.CreateUserRequest;
+import com.app.pos.system.dto.request.UpdateUserRequest;
 import com.app.pos.system.exception.DuplicateException;
 import com.app.pos.system.model.enums.RoleName;
 import jakarta.ws.rs.core.Response;
@@ -61,6 +62,17 @@ public class KeycloakService {
         UserResource userResource = usersResource.get(keycloakId);
         UserRepresentation user = userResource.toRepresentation();
         user.setEnabled(enable);
+        userResource.update(user);
+    }
+
+
+    public void updateUser(String keycloakId, UpdateUserRequest request){
+        UserResource userResource = usersResource.get(keycloakId);
+        UserRepresentation user = userResource.toRepresentation();
+        user.setUsername(request.getUsername());
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+
         userResource.update(user);
     }
 

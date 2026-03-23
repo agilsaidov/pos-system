@@ -1,6 +1,7 @@
 package com.app.pos.system.controller.admin;
 
 import com.app.pos.system.dto.request.CreateUserRequest;
+import com.app.pos.system.dto.request.UpdateUserRequest;
 import com.app.pos.system.dto.response.UserResponse;
 import com.app.pos.system.model.enums.RoleName;
 import com.app.pos.system.service.UserManagementService;
@@ -40,5 +41,11 @@ public class AdminUserController {
                                             @RequestParam Boolean enabled){
         userManagementService.disableUser(userId, enabled);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PutMapping
+    public ResponseEntity<UserResponse> updateResponse(@RequestParam Long userId,
+                                                       @RequestBody UpdateUserRequest request){
+        return ResponseEntity.ok().body(userManagementService.updateUser(userId, request));
     }
 }

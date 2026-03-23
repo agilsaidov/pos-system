@@ -1,7 +1,9 @@
 package com.app.pos.system.service;
 
 import com.app.pos.system.dto.request.CreateUserRequest;
+import com.app.pos.system.dto.request.UpdateUserRequest;
 import com.app.pos.system.dto.response.UserResponse;
+import com.app.pos.system.exception.AlreadyExistsException;
 import com.app.pos.system.exception.BadRequestException;
 import com.app.pos.system.exception.ForbiddenException;
 import com.app.pos.system.exception.NotFoundException;
@@ -60,7 +62,7 @@ public class UserManagementService {
 
         }catch (RuntimeException e){
             keycloakService.deleteUser(keycloakId.toString());
-            throw new RuntimeException("Failed to create user", e);
+            throw new RuntimeException("Failed to create user");
         }
     }
 
@@ -87,13 +89,51 @@ public class UserManagementService {
         boolean isAdmin = user.getUserRoles().stream().anyMatch(ur -> ur.getRole().getRoleName().equals(RoleName.ADMIN));
 
         if(isAdmin){
-            throw new ForbiddenException("CANNOT_DISABLE_ADMIN", "Cannot disable an admin user");
+            throw new ForbiddenException("FORBIDDEN_ACTION", "Cannot disable an admin user");
         }
 
         keycloakService.enableUser(user.getKeycloakId().toString(), enable);
 
         user.setEnabled(enable);
         userRepository.save(user);
+    }
+
+
+    public UserResponse updateUser(Long userId, UpdateUserRequest request){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND", "User with id " + userId + " not found"));
+
+        boolean isAdmin = user.getUserRoles().stream().anyMatch(ur -> ur.getRole().getRoleName().equals(RoleName.ADMIN));
+
+        if (isAdmin){
+            throw new ForbiddenException("FORBIDDEN_ACTION", "Cannot update an admin user");
+        }
+
+        if(!user.getUsername().equals(request.getUsername()) && userRepository.existsUserByUsername(request.getUsername())){
+            throw new AlreadyExistsException("USERNAME_ALREADY_EXISTS", "This username is taken by another user");
+        }
+
+        keycloakService.updateUser(user.getKeycloakId().toString(), request);
+
+        try {
+            user.setUsername(request.getUsername());
+            user.setFullName(request.getFirstName() + " " + request.getLastName());
+            return userMapper.toUserResponse(userRepository.save(user));
+
+        }catch (RuntimeException e){
+            rollbackKeycloakUpdate(user);
+            throw new RuntimeException("Failed to update user");
+        }
+    }
+
+    private void rollbackKeycloakUpdate(User originalUser){
+        UpdateUserRequest rollback = new UpdateUserRequest();
+        rollback.setUsername(originalUser.getUsername());
+
+        String[] nameParts = originalUser.getFullName().split(" ", 2);
+        rollback.setFirstName(nameParts[0]);
+        rollback.setLastName(nameParts.length > 1 ? nameParts[1] : "");
+        keycloakService.updateUser(originalUser.getKeycloakId().toString(), rollback);
     }
 
 }
