@@ -5,7 +5,6 @@ import java.time.Instant;
 public interface CashierDetailsProjection {
     Long getUserId();
     String getUsername();
-    String getFullName();
     Boolean getEnabled();
     Instant getCreatedAt();
     Long getStoreId();
