@@ -10,15 +10,19 @@ import lombok.Data;
 @Data
 public class CreateUserRequest {
 
-    @NotBlank(message = "Username is required")
+    @NotBlank(message = "Field 'username' is required")
     @Size(min = 3, max = 100, message = "Username must be between 3 and 100 characters")
     private String username;
 
-    @NotBlank(message = "First name is required")
+    @NotBlank(message = "Field 'email' is required")
+    @Size(max=255, message = "Email can't be more than 255 characters")
+    private String email;
+
+    @NotBlank(message = "Field 'firstName' is required")
     @Size(max = 100, message = "First name cannot exceed 100 characters")
     private String firstName;
 
-    @NotBlank(message = "Last name is required")
+    @NotBlank(message = "Field 'lastName' is required")
     @Size(max = 100, message = "Last name cannot exceed 100 characters")
     private String lastName;
 
@@ -28,7 +32,7 @@ public class CreateUserRequest {
     @NotNull(message = "Field 'enabled' is required")
     private Boolean enabled;
 
-    @NotBlank(message = "Password is required")
+    @NotBlank(message = "Field 'password' is required")
     @Size(min = 6, message = "Password must be at least 6 characters")
     @Pattern(
             regexp = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]).*$",

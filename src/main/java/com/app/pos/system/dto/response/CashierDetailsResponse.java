@@ -8,6 +8,7 @@ import java.time.Instant;
 public class CashierDetailsResponse {
     private Long userId;
     private String username;
+    private String email;
     private String firstName;
     private String lastName;
     private Boolean enabled;

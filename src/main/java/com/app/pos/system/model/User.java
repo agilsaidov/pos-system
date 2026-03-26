@@ -24,8 +24,11 @@ public class User {
     @Column(name = "keycloak_id", unique = true)
     private UUID keycloakId;
 
-    @Column(name = "username", nullable = false)
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
+
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
 
     @Column(name = "first_name", nullable = false)
     private String firstName;

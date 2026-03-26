@@ -44,6 +44,7 @@ public class UserManagementService {
             User user = new User();
             user.setKeycloakId(keycloakId);
             user.setUsername(request.getUsername());
+            user.setEmail(request.getEmail());
             user.setFirstName(request.getFirstName());
             user.setLastName(request.getLastName());
             user.setEnabled(true);
