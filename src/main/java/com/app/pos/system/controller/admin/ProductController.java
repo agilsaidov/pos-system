@@ -1,4 +1,4 @@
-package com.app.pos.system.controller.mgmt;
+package com.app.pos.system.controller.admin;
 
 import com.app.pos.system.dto.request.ProductRequest;
 import com.app.pos.system.dto.response.ProductResponse;
@@ -11,9 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/mgmt/products")
+@RequestMapping("/api/products")
 @RequiredArgsConstructor
-public class MgmtProductController {
+public class ProductController {
 
     private final ProductService productService;
 

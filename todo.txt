@@ -1,0 +1,8 @@
+// TODO: (MgmtProducts) Add isProductActive check to all methods
+
+// TODO: Create endpoint(in AuthController) for users to change their password(OTP Check).
+    + Connect Redis
+
+// TODO: After all these check methods for improvements and check is there any essential endpoint left
+
+// TODO: Start writing sales controller/service endpoints
