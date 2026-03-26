@@ -77,6 +77,15 @@ public class KeycloakService {
     }
 
 
+    public void changePassword(String keycloakId, String password){
+        UserResource userResource = usersResource.get(keycloakId);
+        UserRepresentation user = userResource.toRepresentation();
+        user.setCredentials(List.of(createCredential(password)));
+
+        userResource.update(user);
+    }
+
+
     private void assignRole(String keycloakId, RoleName roleName){
 
         RoleRepresentation role = realmResource.roles()

@@ -1,5 +1,6 @@
 package com.app.pos.system.service;
 
+import com.app.pos.system.dto.request.ChangePasswordRequest;
 import com.app.pos.system.dto.request.CreateUserRequest;
 import com.app.pos.system.dto.request.UpdateUserRequest;
 import com.app.pos.system.dto.response.UserResponse;
@@ -126,6 +127,22 @@ public class UserManagementService {
             rollbackKeycloakUpdate(user);
             throw new RuntimeException("Failed to update user");
         }
+    }
+
+
+    public void changePassword(Long userId, ChangePasswordRequest request){
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND","User with id " + userId + " not found"));
+
+        boolean isAdmin = user.getUserRoles().stream().anyMatch(ur -> ur.getRole().getRoleName().equals(RoleName.ADMIN));
+
+        if(!request.getPassword().equals(request.getConfirmPassword())){
+            throw new BadRequestException("UNMATCHED_PASSWORD", "Password and confirmation password don't match");
+        }
+
+        if(isAdmin) throw new ForbiddenException("FORBIDDEN_ACTION", "Cannot reset an admin user's password");
+
+        keycloakService.changePassword(user.getKeycloakId().toString(), request.getPassword());
     }
 
     private void rollbackKeycloakUpdate(User originalUser){

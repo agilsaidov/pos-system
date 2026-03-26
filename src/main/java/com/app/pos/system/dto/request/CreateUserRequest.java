@@ -28,9 +28,11 @@ public class CreateUserRequest {
     @NotNull(message = "Field 'enabled' is required")
     private Boolean enabled;
 
-    @NotNull(message = "Field 'password' is required")
-    @Size(max = 30, min = 6, message = "Password must be between 6 and 30 elements")
-/*    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\\\d)(?=.*[^a-zA-Z\\\\d]).+$",
-             message = "Password must have symbol/upper/lower-case letters and digit")*/
+    @NotBlank(message = "Password is required")
+    @Size(min = 6, message = "Password must be at least 6 characters")
+    @Pattern(
+            regexp = "^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[^a-zA-Z0-9]).*$",
+            message = "Password must contain at least one letter, one number and one special character"
+    )
     private String password;
 }

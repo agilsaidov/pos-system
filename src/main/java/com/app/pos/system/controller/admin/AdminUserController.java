@@ -1,5 +1,6 @@
 package com.app.pos.system.controller.admin;
 
+import com.app.pos.system.dto.request.ChangePasswordRequest;
 import com.app.pos.system.dto.request.CreateUserRequest;
 import com.app.pos.system.dto.request.UpdateUserRequest;
 import com.app.pos.system.dto.response.UserResponse;
@@ -44,8 +45,16 @@ public class AdminUserController {
     }
 
     @PutMapping
-    public ResponseEntity<UserResponse> updateResponse(@RequestParam Long userId,
+    public ResponseEntity<UserResponse> updateUser(@RequestParam Long userId,
                                                        @RequestBody UpdateUserRequest request){
         return ResponseEntity.ok().body(userManagementService.updateUser(userId, request));
     }
+
+    @PatchMapping("/{id}/change-password")
+    public ResponseEntity<Void> changePassword(@PathVariable(name = "id") Long userId,
+                                               @Valid @RequestBody ChangePasswordRequest request){
+        userManagementService.changePassword(userId, request);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
 }
