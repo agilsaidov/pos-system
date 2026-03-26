@@ -24,7 +24,7 @@ public class MgmtUserController {
     @GetMapping("/cashiers/{cashierId}")
     public ResponseEntity<CashierDetailsResponse> getCashier(
             @PathVariable Long cashierId,
-            @RequestParam(required = true) Long storeId){
+            @RequestParam Long storeId){
         return ResponseEntity.ok().body(userService.getCashier(cashierId, storeId));
     }
 

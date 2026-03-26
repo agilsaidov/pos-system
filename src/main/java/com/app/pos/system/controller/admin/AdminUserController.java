@@ -46,7 +46,7 @@ public class AdminUserController {
 
     @PutMapping
     public ResponseEntity<UserResponse> updateUser(@RequestParam Long userId,
-                                                       @RequestBody UpdateUserRequest request){
+                                                   @RequestBody UpdateUserRequest request){
         return ResponseEntity.ok().body(userManagementService.updateUser(userId, request));
     }
 

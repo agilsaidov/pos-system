@@ -21,8 +21,8 @@ public class PosSaleController {
 
     @GetMapping
     public ResponseEntity<Page<SaleResponse>> getSales(@RequestParam(required = false) Long saleId,
-                                                       @RequestParam(required = true) Long storeId,
-                                                       @RequestParam(required = true) Long cashierId,
+                                                       @RequestParam Long storeId,
+                                                       @RequestParam Long cashierId,
                                                        @RequestParam(required = false) OffsetDateTime from,
                                                        @RequestParam(required = false) OffsetDateTime to,
                                                        @RequestParam(defaultValue = "0") int page,
