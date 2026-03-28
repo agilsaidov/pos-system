@@ -111,4 +111,17 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(exceptionResponse);
     }
+
+
+    @ExceptionHandler(GoneException.class)
+    public ResponseEntity<ExceptionResponse> handleGoneException(GoneException e){
+        ExceptionResponse exceptionResponse = new ExceptionResponse(
+              HttpStatus.GONE,
+              e.getError(),
+              e.getMessage(),
+              LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(HttpStatus.GONE).body(exceptionResponse);
+    }
 }
