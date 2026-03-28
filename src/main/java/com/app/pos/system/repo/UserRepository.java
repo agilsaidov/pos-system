@@ -14,6 +14,5 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
     boolean existsUserByUsername(String username);
 
-    @Query(value = "SELECT * FROM users WHERE email = :input OR username = :input", nativeQuery = true)
-    Optional<User> findByEmailOrUsername(@Param("input") String input);
+    Optional<User> findByEmail(String email);
 }

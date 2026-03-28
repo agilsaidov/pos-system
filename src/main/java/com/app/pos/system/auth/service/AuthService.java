@@ -19,14 +19,14 @@ public class AuthService {
 
     public String forgetPasswordInitiate(ForgetPasswordInitiateRequest request){
 
-        Optional<User> user = userRepository.findByEmailOrUsername(request.getInput());
+        Optional<User> user = userRepository.findByEmail(request.getEmail());
 
         if(user.isEmpty()){
             return "If an account exists with this information, an OTP will be sent";
         }
 
         String email = user.get().getEmail();
-        emailService.sendOtpWithAttachment(email, otpService.sendOtp(email));
+        emailService.sendOtpWithAttachment(email, otpService.storeOtp(email));
         return "If an account exists with this information, an OTP will be sent";
     }
 }

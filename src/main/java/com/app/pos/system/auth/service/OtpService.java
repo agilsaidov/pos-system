@@ -22,7 +22,7 @@ public class OtpService {
     private static final String OTP_PREFIX = "otp:";
     private static final long OTP_TTL = 3;
 
-    public String sendOtp(String email){
+    public String storeOtp(String email){
         String otp = String.valueOf(random.nextInt(900000) + 100000);
         String key = OTP_PREFIX + email;
 
