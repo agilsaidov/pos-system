@@ -1,9 +1,11 @@
 package com.app.pos.system.auth.controller;
 
 import com.app.pos.system.auth.dto.ForgetPasswordInitiateRequest;
+import com.app.pos.system.auth.dto.ForgetPasswordValidateRequest;
 import com.app.pos.system.auth.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,5 +22,11 @@ public class AuthController {
     @PatchMapping("/forget-password/initiate")
     public ResponseEntity<String> forgetPasswordInitiate(@RequestBody @Valid ForgetPasswordInitiateRequest request){
         return ResponseEntity.ok().body(authService.forgetPasswordInitiate(request));
+    }
+
+    @PatchMapping("/forget-password/validate")
+    public ResponseEntity<Void> forgetPasswordValidate(@RequestBody @Valid ForgetPasswordValidateRequest request){
+        authService.forgetPasswordValidate(request);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

@@ -2,13 +2,11 @@ package com.app.pos.system.auth.service;
 
 import com.app.pos.system.exception.BadRequestException;
 import com.app.pos.system.exception.GoneException;
-import com.app.pos.system.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @Service
