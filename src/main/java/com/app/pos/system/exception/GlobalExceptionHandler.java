@@ -3,6 +3,7 @@ package com.app.pos.system.exception;
 import com.app.pos.system.dto.response.ExceptionResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -123,5 +124,31 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.GONE).body(exceptionResponse);
+    }
+
+
+    @ExceptionHandler(JwtException.class)
+    public ResponseEntity<ExceptionResponse> handleJwtException(JwtException e){
+        ExceptionResponse exceptionResponse = new ExceptionResponse(
+                HttpStatus.UNAUTHORIZED,
+                "INVALID_TOKEN",
+                "Token is invalid or expired",
+                LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exceptionResponse);
+    }
+
+
+    @ExceptionHandler(JwtFilterException.class)
+    public ResponseEntity<ExceptionResponse> handleJwtFilterException(JwtFilterException e){
+        ExceptionResponse exceptionResponse = new ExceptionResponse(
+                HttpStatus.UNAUTHORIZED,
+                "UNAUTHORIZED",
+                e.getMessage(),
+                LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exceptionResponse);
     }
 }
