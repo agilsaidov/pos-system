@@ -1,158 +1,114 @@
 package com.app.pos.system.service;
 
-import com.app.pos.system.dto.request.ChangePasswordRequest;
-import com.app.pos.system.dto.request.CreateUserRequest;
-import com.app.pos.system.dto.request.UpdateUserRequest;
-import com.app.pos.system.dto.response.UserResponse;
-import com.app.pos.system.exception.AlreadyExistsException;
-import com.app.pos.system.exception.BadRequestException;
-import com.app.pos.system.exception.ForbiddenException;
+import com.app.pos.system.dto.response.CashierDetailsResponse;
+import com.app.pos.system.exception.AccessDeniedException;
+import com.app.pos.system.exception.DuplicateException;
 import com.app.pos.system.exception.NotFoundException;
 import com.app.pos.system.mapper.UserMapper;
-import com.app.pos.system.model.Role;
+import com.app.pos.system.model.StoreAssignment;
+import com.app.pos.system.model.StoreAssignmentId;
 import com.app.pos.system.model.User;
-import com.app.pos.system.model.UserRole;
-import com.app.pos.system.model.UserRoleId;
-import com.app.pos.system.model.enums.RoleName;
-import com.app.pos.system.repo.RoleRepository;
+import com.app.pos.system.repo.StoreAssignmentRepository;
+import com.app.pos.system.repo.StoreRepository;
 import com.app.pos.system.repo.UserRepository;
-import com.app.pos.system.repo.UserRoleRepository;
-import com.app.pos.system.specification.UserSpec;
+import com.app.pos.system.utils.AuthUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class UserManagementService {
 
+    private final StoreAssignmentRepository storeAssignmentRepository;
+    private final StoreRepository storeRepository;
     private final UserRepository userRepository;
-    private final UserRoleRepository userRoleRepository;
-    private final RoleRepository roleRepository;
-    private final KeycloakService keycloakService;
     private final UserMapper userMapper;
 
-    public UserResponse createUser(CreateUserRequest request){
+    private final AuthUtils authUtils;
 
-        UUID keycloakId = keycloakService.createUser(request);
+    public List<CashierDetailsResponse> getCashiers(Long storeId){
 
-        try {
-            User user = new User();
-            user.setKeycloakId(keycloakId);
-            user.setUsername(request.getUsername());
-            user.setEmail(request.getEmail());
-            user.setFirstName(request.getFirstName());
-            user.setLastName(request.getLastName());
-            user.setEnabled(true);
+        validateStoreAccess(storeId);
 
-            User savedUser = userRepository.save(user);
-
-            Role role = roleRepository.findByRoleName(request.getRole())
-                    .orElseThrow(() -> new NotFoundException("ROLE_NOT_FOUND", "Role not found"));
-
-            UserRole userRole = new UserRole();
-
-            userRole.setUserRoleId(new UserRoleId(savedUser.getUserId(), role.getRoleId()));
-            userRole.setUser(savedUser);
-            userRole.setRole(role);
-            userRoleRepository.save(userRole);
-
-            return userMapper.toUserResponse(savedUser);
-
-        }catch (RuntimeException e){
-            keycloakService.deleteUser(keycloakId.toString());
-            throw new RuntimeException("Failed to create user");
-        }
+        return storeAssignmentRepository.findAllByStoreId(storeId)
+                .stream().map(userMapper::toCashierDetailsResponse)
+                .toList();
     }
 
 
-    public Page<UserResponse> getUsers(Long userId, String search, RoleName role, Boolean enabled, int page, int size){
+    public CashierDetailsResponse getCashier(Long cashierId, Long storeId){
 
-        if (role == RoleName.ADMIN) {
-            throw new BadRequestException("INVALID_ROLE_FILTER", "Cannot filter users by ADMIN role");
+        validateStoreAccess(storeId);
+
+        if(!userRepository.existsById(cashierId)){
+            throw new NotFoundException("CASHIER_NOT_FOUND", "Cashier with id " + cashierId + " not found");
         }
 
-        Pageable pageable = PageRequest.of(page,size);
+        if(!storeAssignmentRepository.existsById(new StoreAssignmentId(cashierId, storeId))){
+            throw new NotFoundException("CASHIER_NOT_IN_STORE", "Cashier not found in the specified store");
+        }
 
-        return userRepository.findAll(UserSpec.withFilters(userId, search, role, enabled), pageable)
-                .map(userMapper::toUserResponse);
+        return userMapper.toCashierDetailsResponse(storeAssignmentRepository.getByUserIdAndStoreId(cashierId, storeId));
 
     }
 
 
-    public void disableUser(Long userId, Boolean enable){
+    @Transactional
+    public void assignCashierToStore(Long cashierId, Long storeId){
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND", "User with id " + userId + " not found"));
+        validateStoreAccess(storeId);
 
-        boolean isAdmin = user.getUserRoles().stream().anyMatch(ur -> ur.getRole().getRoleName().equals(RoleName.ADMIN));
-
-        if(isAdmin){
-            throw new ForbiddenException("FORBIDDEN_ACTION", "Cannot disable an admin user");
+        if(!userRepository.existsById(cashierId)){
+            throw new NotFoundException("CASHIER_NOT_FOUND", "Cashier with id " + cashierId + " not found");
         }
 
-        keycloakService.enableUser(user.getKeycloakId().toString(), enable);
+        if (storeAssignmentRepository.existsById(new StoreAssignmentId(cashierId, storeId))) {
+            throw new DuplicateException("ALREADY_ASSIGNED", "Cashier already assigned to this store");
+        }
 
-        user.setEnabled(enable);
-        userRepository.save(user);
+        StoreAssignment assignment = new StoreAssignment();
+        assignment.setStoreAssignmentId(new StoreAssignmentId(cashierId, storeId));
+        assignment.setUser(userRepository.getReferenceById(cashierId));
+        assignment.setStore(storeRepository.getReferenceById(storeId));
+        storeAssignmentRepository.save(assignment);
     }
 
 
-    public UserResponse updateUser(Long userId, UpdateUserRequest request){
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND", "User with id " + userId + " not found"));
+    @Transactional
+    public void unAssignCashierFromStore(Long cashierId, Long storeId){
 
-        boolean isAdmin = user.getUserRoles().stream().anyMatch(ur -> ur.getRole().getRoleName().equals(RoleName.ADMIN));
+        validateStoreAccess(storeId);
 
-        if (isAdmin){
-            throw new ForbiddenException("FORBIDDEN_ACTION", "Cannot update an admin user");
+        if(!userRepository.existsById(cashierId)){
+            throw new NotFoundException("CASHIER_NOT_FOUND", "Cashier with id " + cashierId + " not found");
         }
 
-        if(!user.getUsername().equals(request.getUsername()) && userRepository.existsUserByUsername(request.getUsername())){
-            throw new AlreadyExistsException("USERNAME_ALREADY_EXISTS", "This username is taken by another user");
+        if(!storeAssignmentRepository.existsById(new StoreAssignmentId(cashierId, storeId))){
+            throw new NotFoundException("CASHIER_NOT_IN_STORE", "Cashier not found in the specified store");
         }
 
-        keycloakService.updateUser(user.getKeycloakId().toString(), request);
-
-        try {
-            user.setUsername(request.getUsername());
-            user.setFirstName(request.getFirstName());
-            user.setLastName(request.getLastName());
-            return userMapper.toUserResponse(userRepository.save(user));
-
-        }catch (RuntimeException e){
-            rollbackKeycloakUpdate(user);
-            throw new RuntimeException("Failed to update user");
-        }
+        storeAssignmentRepository.deleteById(new StoreAssignmentId(cashierId, storeId));
     }
 
 
-    public void changePassword(Long userId, ChangePasswordRequest request){
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND","User with id " + userId + " not found"));
-
-        boolean isAdmin = user.getUserRoles().stream().anyMatch(ur -> ur.getRole().getRoleName().equals(RoleName.ADMIN));
-
-        if(!request.getPassword().equals(request.getConfirmPassword())){
-            throw new BadRequestException("UNMATCHED_PASSWORD", "Password and confirmation password don't match");
+    private void validateStoreAccess(Long storeId) {
+        if (!storeRepository.existsById(storeId)) {
+            throw new NotFoundException("STORE_NOT_FOUND", "Store with id " + storeId + " not found");
         }
 
-        if(isAdmin) throw new ForbiddenException("FORBIDDEN_ACTION", "Cannot reset an admin user's password");
+        if(authUtils.isManager()) {
+            UUID keycloakId = authUtils.getCurrentUserKeycloakId();
+            User manager = userRepository.findByKeycloakId(keycloakId)
+                    .orElseThrow(() -> new NotFoundException("MANAGER_NOT_FOUND", "Manager not found"));
 
-        keycloakService.changePassword(user.getKeycloakId().toString(), request.getPassword());
+
+            if (!storeAssignmentRepository.existsById(new StoreAssignmentId(manager.getUserId(), storeId))) {
+                throw new AccessDeniedException("Manager with id " + manager.getUserId() + " does not have access to store " + storeId);
+            }
+        }
     }
-
-    private void rollbackKeycloakUpdate(User originalUser){
-        UpdateUserRequest rollback = new UpdateUserRequest();
-        rollback.setUsername(originalUser.getUsername());
-        rollback.setFirstName(originalUser.getFirstName());
-        rollback.setLastName(originalUser.getLastName());
-
-        keycloakService.updateUser(originalUser.getKeycloakId().toString(), rollback);
-    }
-
 }

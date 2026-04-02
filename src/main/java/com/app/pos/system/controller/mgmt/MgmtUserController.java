@@ -1,7 +1,7 @@
 package com.app.pos.system.controller.mgmt;
 
 import com.app.pos.system.dto.response.CashierDetailsResponse;
-import com.app.pos.system.service.UserService;
+import com.app.pos.system.service.UserManagementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,23 +14,23 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MgmtUserController {
 
-    private final UserService userService;
+    private final UserManagementService userService;
 
-    @GetMapping("/cashiers")
-    public ResponseEntity<List<CashierDetailsResponse>> getCashiers(@RequestParam Long storeId){
-        return ResponseEntity.ok().body(userService.getCashiers(storeId));
+    @GetMapping("/cashiers/stores/{storeId}")
+    public ResponseEntity<List<CashierDetailsResponse>> getCashiers(@PathVariable Long storeId){
+        return ResponseEntity.ok(userService.getCashiers(storeId));
     }
 
-    @GetMapping("/cashiers/{cashierId}")
+    @GetMapping("/cashiers/{cashierId}/stores/{storeId}")
     public ResponseEntity<CashierDetailsResponse> getCashier(
             @PathVariable Long cashierId,
-            @RequestParam Long storeId){
-        return ResponseEntity.ok().body(userService.getCashier(cashierId, storeId));
+            @PathVariable Long storeId){
+        return ResponseEntity.ok(userService.getCashier(cashierId, storeId));
     }
 
     @PostMapping("/cashiers/{cashierId}/stores/{storeId}")
     public ResponseEntity<Void> assignToStore(@PathVariable Long cashierId,
-                                          @PathVariable Long storeId){
+                                              @PathVariable Long storeId){
 
         userService.assignCashierToStore(cashierId, storeId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
