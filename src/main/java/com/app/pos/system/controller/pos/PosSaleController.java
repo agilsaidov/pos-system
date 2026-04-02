@@ -20,15 +20,14 @@ public class PosSaleController {
     private final SaleService saleService;
 
     @GetMapping
-    public ResponseEntity<Page<SaleResponse>> getSales(@RequestParam(required = false) Long saleId,
-                                                       @RequestParam Long storeId,
-                                                       @RequestParam Long cashierId,
+    public ResponseEntity<Page<SaleResponse>> getSalesForCashier(@RequestParam(required = false) Long saleId,
+                                                       @RequestParam(required = false) Long storeId,
                                                        @RequestParam(required = false) OffsetDateTime from,
                                                        @RequestParam(required = false) OffsetDateTime to,
                                                        @RequestParam(defaultValue = "0") int page,
                                                        @RequestParam(defaultValue = "10") int size){
 
-        return ResponseEntity.ok().body(saleService.getSalesForCashier(saleId, cashierId,storeId, from, to, page, size));
+        return ResponseEntity.ok().body(saleService.getSalesForCashier(saleId, storeId, from, to, page, size));
 
     }
 }
