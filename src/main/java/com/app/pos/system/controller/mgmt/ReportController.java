@@ -20,22 +20,22 @@ public class ReportController {
     private final ReportService reportService;
 
     @GetMapping("/cashiers")
-    public ResponseEntity<List<CashierReportResponse>> getReports(
+    public ResponseEntity<List<CashierReportResponse>> getCashiersReports(
             @RequestParam Long storeId,
             @RequestParam(required = false) OffsetDateTime from,
             @RequestParam(required = false) OffsetDateTime to
             ){
 
-        return ResponseEntity.ok().body(reportService.getReports(storeId, from, to));
+        return ResponseEntity.ok().body(reportService.getCashiersReports(storeId, from, to));
     }
 
     @GetMapping("/cashiers/{cashierId}")
-    public ResponseEntity<DetailedCashierReportResponse> getDetailedReport(@PathVariable Long cashierId,
+    public ResponseEntity<DetailedCashierReportResponse> getDetailedCashierReport(@PathVariable Long cashierId,
                                                                            @RequestParam Long storeId,
                                                                            @RequestParam(required = false) OffsetDateTime from,
                                                                            @RequestParam(required = false) OffsetDateTime to){
 
-        return ResponseEntity.ok().body(reportService.getDetailedReport(cashierId, storeId, from, to));
+        return ResponseEntity.ok().body(reportService.getDetailedCashierReport(cashierId, storeId, from, to));
     }
 
     @GetMapping("/daily")
