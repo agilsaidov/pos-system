@@ -34,14 +34,13 @@ public class InventoryService {
 
     public Page<InventoryResponse> getInventory(Long storeId, int page, int size){
 
-        UUID keycloakId = authUtils.getCurrentUserKeycloakId();
-
         if(!storeRepository.existsById(storeId)){
             throw new NotFoundException("STORE_NOT_FOUND", "Store with id " + storeId + " not found");
         }
 
         if(authUtils.isManager()){
 
+            UUID keycloakId = authUtils.getCurrentUserKeycloakId();
             User manager = userRepository.findByKeycloakId(keycloakId)
                     .orElseThrow(() -> new NotFoundException("MANAGER_NOT_FOUND", "Manager not found"));
 

@@ -22,8 +22,6 @@ public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-    @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri}")
-    private String issuerUri;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
@@ -40,6 +38,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,"/api/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT,"/api/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PATCH,"/api/products/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/pos/sales").hasRole("CASHIER")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/mgmt/**").hasAnyRole("ADMIN", "MANAGER")
                         .requestMatchers("/api/pos/**").hasAnyRole("ADMIN", "MANAGER", "CASHIER")
