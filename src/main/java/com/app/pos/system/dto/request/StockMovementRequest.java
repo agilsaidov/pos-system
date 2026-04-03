@@ -11,9 +11,6 @@ import lombok.Setter;
 @Setter
 public class StockMovementRequest {
 
-    @NotNull(message = "Manager id is required")
-    private Long managerId;
-
     @NotNull(message = "Store is required")
     private Long storeId;
 
