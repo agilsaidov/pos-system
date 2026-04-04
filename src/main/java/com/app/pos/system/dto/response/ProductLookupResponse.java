@@ -9,6 +9,7 @@ public class ProductLookupResponse {
     private Long productId;
     private String barcode;
     private String name;
-    private BigDecimal price;
     private BigDecimal taxRate;
+    private BigDecimal discountAmount;
+    private BigDecimal finalPrice;
 }

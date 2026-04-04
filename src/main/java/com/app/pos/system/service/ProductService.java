@@ -3,6 +3,7 @@ package com.app.pos.system.service;
 import com.app.pos.system.dto.request.ProductRequest;
 import com.app.pos.system.dto.response.ProductLookupResponse;
 import com.app.pos.system.dto.response.ProductResponse;
+import com.app.pos.system.exception.BadRequestException;
 import com.app.pos.system.exception.DuplicateException;
 import com.app.pos.system.exception.NotFoundException;
 import com.app.pos.system.mapper.ProductMapper;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -23,6 +25,7 @@ public class ProductService {
 
     private final ProductRepository productRepo;
     private final ProductMapper productMapper;
+    private final PromotionService promotionService;
 
     public ProductLookupResponse lookup(String barcode){
         Product product = productRepo.findByBarcode(barcode)
@@ -31,7 +34,21 @@ public class ProductService {
                         "No product found with barcode: " + barcode)
                 );
 
-        return productMapper.toLookupResponse(product);
+        if(!product.getActive()){
+            throw new BadRequestException(
+                    "INACTIVE_PRODUCT",
+                    "Product with barcode " + barcode + " is inactive and can't be sold"
+            );
+        }
+
+        BigDecimal discountAmount =  promotionService.getActiveDiscount(product.getProductId(), product.getPrice());
+        BigDecimal finalPrice = product.getPrice().subtract(discountAmount);
+
+        ProductLookupResponse response = productMapper.toLookupResponse(product);
+        response.setDiscountAmount(discountAmount);
+        response.setFinalPrice(finalPrice);
+
+        return response;
     }
 
     public ProductResponse createProduct(ProductRequest request){
