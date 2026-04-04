@@ -14,7 +14,7 @@ public class PromotionProduct {
     @EmbeddedId
     private PromotionProductId promotionProductId;
 
-    @MapsId("producId")
+    @MapsId("productId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;

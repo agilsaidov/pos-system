@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.type.PostgreSQLEnumJdbcType;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 @Entity
@@ -29,7 +30,7 @@ public class Promotion {
     private PromoType type;
 
     @Column(name = "value", nullable = false)
-    private Double value;
+    private BigDecimal value;
 
     @Column(name = "starts_at", nullable = false)
     private OffsetDateTime startsAt;
