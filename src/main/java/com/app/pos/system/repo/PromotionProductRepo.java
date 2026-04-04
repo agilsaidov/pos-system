@@ -23,4 +23,15 @@ public interface PromotionProductRepo extends JpaRepository<PromotionProduct, Pr
     Optional<PromotionProduct> findActivePromotionForProduct(
             @Param("productId") Long productId,
             @Param("now") OffsetDateTime now);
+
+    @Query(value = """
+    SELECT EXISTS (
+        SELECT 1 FROM promotion_products pp
+        JOIN promotions p ON pp.promotion_id = p.id
+        WHERE pp.product_id = :productId 
+          AND p.active = true 
+          AND p.ends_at >= NOW()
+    )
+    """, nativeQuery = true)
+    Boolean existsActivePromotionByProductId(@Param("productId") Long productId);
 }
