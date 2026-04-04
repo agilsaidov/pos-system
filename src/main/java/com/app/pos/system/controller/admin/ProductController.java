@@ -41,7 +41,7 @@ public class ProductController {
         return ResponseEntity.ok().body(productService.getProducts(search, barcode, page, size));
     }
 
-    @PatchMapping("/{id}/active")
+    @PatchMapping("/{id}/activate")
     public ResponseEntity<Void> toggleProductActive(@PathVariable Long id,
                                                     @RequestParam("active") Boolean active){
 

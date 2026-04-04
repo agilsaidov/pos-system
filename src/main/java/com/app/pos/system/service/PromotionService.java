@@ -3,6 +3,7 @@ package com.app.pos.system.service;
 import com.app.pos.system.dto.request.CreatePromotionRequest;
 import com.app.pos.system.dto.response.PromotionResponse;
 import com.app.pos.system.exception.AlreadyExistsException;
+import com.app.pos.system.exception.BadRequestException;
 import com.app.pos.system.exception.NotFoundException;
 import com.app.pos.system.mapper.PromotionMapper;
 import com.app.pos.system.model.Product;
@@ -14,6 +15,7 @@ import com.app.pos.system.repo.PromotionProductRepo;
 import com.app.pos.system.repo.PromotionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -43,6 +45,7 @@ public class PromotionService {
     }
 
 
+    @Transactional
     public PromotionResponse createPromotion(CreatePromotionRequest request){
         Product product = productRepository.getProductByProductId(request.getProductId())
                 .orElseThrow(() -> new NotFoundException("PRODUCT_NOT_FOUND", "Product with id " + request.getProductId() + " not found"));
@@ -57,5 +60,19 @@ public class PromotionService {
                 new PromotionProductId(promotion.getPromotionId(), product.getProductId()), product, promotion));
 
         return promotionMapper.toResponseFromPromotionProduct(promotionProduct);
+    }
+
+
+    @Transactional
+    public void togglePromotionActive(Long promotionId, Boolean active){
+        Promotion promotion = promotionRepository.findById(promotionId)
+                .orElseThrow(() -> new NotFoundException("PROMOTION_NOT_FOUND", "Promotion with id " + promotionId + " not found"));
+
+        if(promotion.getEndsAt().isBefore(OffsetDateTime.now())){
+            throw new BadRequestException("EXPIRED_PROMOTION", "Cannot activate or deactivate an expired promotion");
+        }
+
+        promotion.setActive(active);
+        promotionRepository.save(promotion);
     }
 }

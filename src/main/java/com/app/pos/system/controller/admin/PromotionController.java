@@ -6,10 +6,7 @@ import com.app.pos.system.service.PromotionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/promotions")
@@ -21,5 +18,12 @@ public class PromotionController {
     @PostMapping
     public ResponseEntity<PromotionResponse> createPromotion(@RequestBody CreatePromotionRequest request){
         return ResponseEntity.status(HttpStatus.CREATED).body(promotionService.createPromotion(request));
+    }
+
+    @PatchMapping("/{id}/activate")
+    public ResponseEntity<Void> togglePromotionActive(@RequestParam Boolean active,
+                                                      @PathVariable(name = "id") Long promotionId){
+        promotionService.togglePromotionActive(promotionId, active);
+        return ResponseEntity.noContent().build();
     }
 }
