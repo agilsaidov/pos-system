@@ -13,7 +13,11 @@ import com.app.pos.system.model.PromotionProductId;
 import com.app.pos.system.repo.ProductRepository;
 import com.app.pos.system.repo.PromotionProductRepo;
 import com.app.pos.system.repo.PromotionRepository;
+import com.app.pos.system.specification.PromotionSpec;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,21 +49,23 @@ public class PromotionService {
     }
 
 
+    public Page<PromotionResponse> getPromotions(String name,
+                                                 Boolean active,
+                                                 OffsetDateTime startsAt, OffsetDateTime endsAt,
+                                                 int page, int size){
+
+        Pageable pageable = PageRequest.of(page, size);
+        return promotionRepository.findAll(
+                PromotionSpec.withFilter(name,active,startsAt,endsAt), pageable)
+                .map(promotionMapper::toResponse);
+    }
+
+
     @Transactional
     public PromotionResponse createPromotion(CreatePromotionRequest request){
-        Product product = productRepository.getProductByProductId(request.getProductId())
-                .orElseThrow(() -> new NotFoundException("PRODUCT_NOT_FOUND", "Product with id " + request.getProductId() + " not found"));
-
-        if(promotionProductRepo.existsActivePromotionByProductId(request.getProductId())){
-            throw new AlreadyExistsException("PROMOTION_ALREADY_EXISTS", "An active promotion for this product already exists");
-        }
 
         Promotion promotion = promotionRepository.save(promotionMapper.toEntityFromCreatePromotionRequest(request));
-
-        PromotionProduct promotionProduct = promotionProductRepo.save(new PromotionProduct(
-                new PromotionProductId(promotion.getPromotionId(), product.getProductId()), product, promotion));
-
-        return promotionMapper.toResponseFromPromotionProduct(promotionProduct);
+        return promotionMapper.toResponse(promotion);
     }
 
 

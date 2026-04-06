@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface PromotionProductRepo extends JpaRepository<PromotionProduct, PromotionProductId> {
@@ -24,14 +25,20 @@ public interface PromotionProductRepo extends JpaRepository<PromotionProduct, Pr
             @Param("productId") Long productId,
             @Param("now") OffsetDateTime now);
 
+
+
     @Query(value = """
-    SELECT EXISTS (
-        SELECT 1 FROM promotion_products pp
+        SELECT pp.* FROM promotion_products pp
         JOIN promotions p ON pp.promotion_id = p.id
-        WHERE pp.product_id = :productId 
-          AND p.active = true 
-          AND p.ends_at >= NOW()
-    )
-    """, nativeQuery = true)
-    Boolean existsActivePromotionByProductId(@Param("productId") Long productId);
+        WHERE pp.product_id = :productId
+        """, nativeQuery = true)
+    List<PromotionProduct> findAllByProductId(@Param("productId") Long productId);
+
+
+    @Query(value = """
+        SELECT pp.* FROM promotion_products pp
+        JOIN products p ON pp.product_id = p.id
+        WHERE pp.promotion_id = :promotionId
+        """, nativeQuery = true)
+    List<PromotionProduct> findAllByPromotionId(@Param("promotionId") Long promotionId);
 }
