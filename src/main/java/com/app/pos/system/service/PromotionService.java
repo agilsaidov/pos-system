@@ -2,10 +2,12 @@ package com.app.pos.system.service;
 
 import com.app.pos.system.dto.request.CreatePromotionRequest;
 import com.app.pos.system.dto.response.PromotionResponse;
+import com.app.pos.system.dto.response.PromotionWithProductsResponse;
 import com.app.pos.system.exception.BadRequestException;
 import com.app.pos.system.exception.NotFoundException;
 import com.app.pos.system.mapper.PromotionMapper;
 import com.app.pos.system.model.Promotion;
+import com.app.pos.system.model.PromotionProduct;
 import com.app.pos.system.repo.ProductRepository;
 import com.app.pos.system.repo.PromotionProductRepo;
 import com.app.pos.system.repo.PromotionRepository;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -63,6 +66,22 @@ public class PromotionService {
 
         return promotionProductRepo.findAllByProductId(productId, pageable)
                 .map(pp -> promotionMapper.toResponse(pp.getPromotion()));
+    }
+
+
+    public PromotionWithProductsResponse getPromotionWithProducts(Long promotionId){
+        Promotion promotion = promotionRepository.findById(promotionId)
+                .orElseThrow(() -> new NotFoundException("PROMOTION_NOT_FOUND", "Promotion with id " + promotionId + " not found"));
+
+        List<PromotionProduct> promotionProducts = promotionProductRepo.findAllByPromotionId(promotionId);
+
+        PromotionWithProductsResponse response = promotionMapper.toPromotionWithProductsResponse(promotion);
+
+        response.setPromotionProducts(promotionProducts.stream()
+                .map(pp -> promotionMapper.toProductResponse(pp.getProduct()))
+                .toList());
+
+        return response;
     }
 
 

@@ -2,6 +2,7 @@ package com.app.pos.system.controller.admin;
 
 import com.app.pos.system.dto.request.CreatePromotionRequest;
 import com.app.pos.system.dto.response.PromotionResponse;
+import com.app.pos.system.dto.response.PromotionWithProductsResponse;
 import com.app.pos.system.service.PromotionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -31,13 +32,21 @@ public class PromotionController {
     }
 
 
-    @GetMapping("/{productId}")
+    @GetMapping("/by-product/{productId}")
     public ResponseEntity<Page<PromotionResponse>> getPromotionsByProduct(@PathVariable Long productId,
                                                                           @RequestParam(defaultValue = "0") int page,
                                                                           @RequestParam(defaultValue = "10") int size){
 
         return ResponseEntity.ok().body(promotionService.getPromotionsByProduct(productId, page, size));
     }
+
+
+    @GetMapping("/{promotionId}")
+    public ResponseEntity<PromotionWithProductsResponse> getPromotionWithProducts(@PathVariable Long promotionId){
+
+        return ResponseEntity.ok().body(promotionService.getPromotionWithProducts(promotionId));
+    }
+
 
     @PostMapping
     public ResponseEntity<PromotionResponse> createPromotion(@RequestBody CreatePromotionRequest request){
