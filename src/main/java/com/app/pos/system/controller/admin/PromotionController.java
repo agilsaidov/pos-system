@@ -30,6 +30,15 @@ public class PromotionController {
         return ResponseEntity.ok().body(promotionService.getPromotions(name, active, startsAt, endsAt, page, size));
     }
 
+
+    @GetMapping("/{productId}")
+    public ResponseEntity<Page<PromotionResponse>> getPromotionsByProduct(@PathVariable Long productId,
+                                                                          @RequestParam(defaultValue = "0") int page,
+                                                                          @RequestParam(defaultValue = "10") int size){
+
+        return ResponseEntity.ok().body(promotionService.getPromotionsByProduct(productId, page, size));
+    }
+
     @PostMapping
     public ResponseEntity<PromotionResponse> createPromotion(@RequestBody CreatePromotionRequest request){
         return ResponseEntity.status(HttpStatus.CREATED).body(promotionService.createPromotion(request));

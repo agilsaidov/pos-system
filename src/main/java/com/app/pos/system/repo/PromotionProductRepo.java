@@ -2,6 +2,8 @@ package com.app.pos.system.repo;
 
 import com.app.pos.system.model.PromotionProduct;
 import com.app.pos.system.model.PromotionProductId;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,6 +13,24 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PromotionProductRepo extends JpaRepository<PromotionProduct, PromotionProductId> {
+
+
+
+/*    @Query(value = """
+            SELECT pp.* FROM promotion_products pp
+            JOIN promotions p ON pp.promotion_id = p.id
+            WHERE pp.product_id = :productId
+            AND p.active = true
+            AND p.starts_at <= :now
+            AND p.ends_at >= :now
+            ORDER BY p.value DESC
+            LIMIT 1
+            """, nativeQuery = true)
+    Optional<PromotionProduct> findActivePromotionForProduct(
+            @Param("productId") Long productId,
+            @Param("now") OffsetDateTime now);*/
+
+
 
     @Query(value = """
         SELECT pp.* FROM promotion_products pp
@@ -32,7 +52,7 @@ public interface PromotionProductRepo extends JpaRepository<PromotionProduct, Pr
         JOIN promotions p ON pp.promotion_id = p.id
         WHERE pp.product_id = :productId
         """, nativeQuery = true)
-    List<PromotionProduct> findAllByProductId(@Param("productId") Long productId);
+    Page<PromotionProduct> findAllByProductId(@Param("productId") Long productId, Pageable pageable);
 
 
     @Query(value = """

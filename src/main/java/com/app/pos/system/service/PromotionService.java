@@ -2,14 +2,10 @@ package com.app.pos.system.service;
 
 import com.app.pos.system.dto.request.CreatePromotionRequest;
 import com.app.pos.system.dto.response.PromotionResponse;
-import com.app.pos.system.exception.AlreadyExistsException;
 import com.app.pos.system.exception.BadRequestException;
 import com.app.pos.system.exception.NotFoundException;
 import com.app.pos.system.mapper.PromotionMapper;
-import com.app.pos.system.model.Product;
 import com.app.pos.system.model.Promotion;
-import com.app.pos.system.model.PromotionProduct;
-import com.app.pos.system.model.PromotionProductId;
 import com.app.pos.system.repo.ProductRepository;
 import com.app.pos.system.repo.PromotionProductRepo;
 import com.app.pos.system.repo.PromotionRepository;
@@ -58,6 +54,15 @@ public class PromotionService {
         return promotionRepository.findAll(
                 PromotionSpec.withFilter(name,active,startsAt,endsAt), pageable)
                 .map(promotionMapper::toResponse);
+    }
+
+
+    public Page<PromotionResponse> getPromotionsByProduct(Long productId, int page, int size ){
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return promotionProductRepo.findAllByProductId(productId, pageable)
+                .map(pp -> promotionMapper.toResponse(pp.getPromotion()));
     }
 
 
