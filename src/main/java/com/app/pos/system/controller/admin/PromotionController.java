@@ -1,5 +1,6 @@
 package com.app.pos.system.controller.admin;
 
+import com.app.pos.system.dto.request.AddProductsToPromotionRequest;
 import com.app.pos.system.dto.request.CreatePromotionRequest;
 import com.app.pos.system.dto.request.UpdatePromotionRequest;
 import com.app.pos.system.dto.response.PromotionResponse;
@@ -63,8 +64,16 @@ public class PromotionController {
     }
 
 
-    @PatchMapping("/{id}/activate")
-    public ResponseEntity<Void> togglePromotionActive(@RequestParam Boolean active,
+    @PostMapping("/{promotionId}/products")
+    public ResponseEntity<Void> addProducts(@PathVariable Long promotionId,
+                                            @RequestBody @Valid AddProductsToPromotionRequest request){
+        promotionService.addProductsToPromotion(promotionId, request);
+        return ResponseEntity.ok().build();
+    }
+
+
+    @PatchMapping("/{id}/activate/{active}")
+    public ResponseEntity<Void> togglePromotionActive(@PathVariable Boolean active,
                                                       @PathVariable(name = "id") Long promotionId){
         promotionService.togglePromotionActive(promotionId, active);
         return ResponseEntity.noContent().build();
