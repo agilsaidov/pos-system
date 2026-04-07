@@ -104,6 +104,13 @@ public class PromotionService {
         Promotion promotion = promotionRepository.findById(promotionId)
                 .orElseThrow(() -> new NotFoundException("PROMOTION_NOT_FOUND", "Promotion with id " + promotionId + " not found"));
 
+
+        if (promotion.getActive() &&
+                promotion.getStartsAt().isBefore(OffsetDateTime.now())) {
+            throw new BadRequestException("PROMOTION_ACTIVE",
+                    "Cannot update an active promotion. Deactivate it first.");
+        }
+
         promotion.setName(request.getName());
         promotion.setValue(request.getValue());
         promotion.setType(request.getType());
@@ -147,13 +154,16 @@ public class PromotionService {
             throw new BadRequestException("EXPIRED_PROMOTION", "Cannot activate or deactivate an expired promotion");
         }
 
+        if(active == true){
+            Long id = promotionProductRepo.getConflictingProductId(promotionId);
+
+            if(id != null){
+                throw new BadRequestException("BAD_REQUEST", "Product with id " + id + " has another active promotion");
+            }
+        }
+
         promotion.setActive(active);
         promotionRepository.save(promotion);
     }
 
-
-    @Transactional
-    public void deletePromotion(Long promotionId){
-        promotionRepository.deleteById(promotionId);
-    }
 }

@@ -78,11 +78,5 @@ public class PromotionController {
         promotionService.togglePromotionActive(promotionId, active);
         return ResponseEntity.noContent().build();
     }
-
-
-    @DeleteMapping
-    public ResponseEntity<Void> deletePromotion(@RequestParam Long promotionId){
-        promotionService.deletePromotion(promotionId);
-        return ResponseEntity.noContent().build();
-    }
+    
 }
