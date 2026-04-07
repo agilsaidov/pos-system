@@ -1,6 +1,7 @@
 package com.app.pos.system.service;
 
 import com.app.pos.system.dto.request.CreatePromotionRequest;
+import com.app.pos.system.dto.request.UpdatePromotionRequest;
 import com.app.pos.system.dto.response.PromotionResponse;
 import com.app.pos.system.dto.response.PromotionWithProductsResponse;
 import com.app.pos.system.exception.BadRequestException;
@@ -94,6 +95,21 @@ public class PromotionService {
 
 
     @Transactional
+    public PromotionResponse updatePromotion(Long promotionId, UpdatePromotionRequest request){
+        Promotion promotion = promotionRepository.findById(promotionId)
+                .orElseThrow(() -> new NotFoundException("PROMOTION_NOT_FOUND", "Promotion with id " + promotionId + " not found"));
+
+        promotion.setName(request.getName());
+        promotion.setValue(request.getValue());
+        promotion.setType(request.getType());
+        promotion.setStartsAt(request.getStartsAt());
+        promotion.setEndsAt(request.getEndsAt());
+
+        return promotionMapper.toResponse(promotionRepository.save(promotion));
+    }
+
+
+    @Transactional
     public void togglePromotionActive(Long promotionId, Boolean active){
         Promotion promotion = promotionRepository.findById(promotionId)
                 .orElseThrow(() -> new NotFoundException("PROMOTION_NOT_FOUND", "Promotion with id " + promotionId + " not found"));
@@ -104,5 +120,11 @@ public class PromotionService {
 
         promotion.setActive(active);
         promotionRepository.save(promotion);
+    }
+
+
+    @Transactional
+    public void deletePromotion(Long promotionId){
+        promotionRepository.deleteById(promotionId);
     }
 }

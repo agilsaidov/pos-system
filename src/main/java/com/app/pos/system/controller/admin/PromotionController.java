@@ -1,9 +1,11 @@
 package com.app.pos.system.controller.admin;
 
 import com.app.pos.system.dto.request.CreatePromotionRequest;
+import com.app.pos.system.dto.request.UpdatePromotionRequest;
 import com.app.pos.system.dto.response.PromotionResponse;
 import com.app.pos.system.dto.response.PromotionWithProductsResponse;
 import com.app.pos.system.service.PromotionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -49,14 +51,29 @@ public class PromotionController {
 
 
     @PostMapping
-    public ResponseEntity<PromotionResponse> createPromotion(@RequestBody CreatePromotionRequest request){
+    public ResponseEntity<PromotionResponse> createPromotion(@RequestBody @Valid CreatePromotionRequest request){
         return ResponseEntity.status(HttpStatus.CREATED).body(promotionService.createPromotion(request));
     }
+
+
+    @PutMapping("/{promotionId}")
+    public ResponseEntity<PromotionResponse> updatePromotion(@PathVariable Long promotionId,
+                                                             @RequestBody @Valid UpdatePromotionRequest request){
+        return ResponseEntity.ok().body(promotionService.updatePromotion(promotionId, request));
+    }
+
 
     @PatchMapping("/{id}/activate")
     public ResponseEntity<Void> togglePromotionActive(@RequestParam Boolean active,
                                                       @PathVariable(name = "id") Long promotionId){
         promotionService.togglePromotionActive(promotionId, active);
+        return ResponseEntity.noContent().build();
+    }
+
+
+    @DeleteMapping
+    public ResponseEntity<Void> deletePromotion(@RequestParam Long promotionId){
+        promotionService.deletePromotion(promotionId);
         return ResponseEntity.noContent().build();
     }
 }

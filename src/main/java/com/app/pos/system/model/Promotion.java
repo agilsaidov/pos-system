@@ -3,6 +3,7 @@ package com.app.pos.system.model;
 import com.app.pos.system.model.enums.PromoType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcType;
@@ -14,6 +15,7 @@ import java.time.OffsetDateTime;
 @Entity
 @NoArgsConstructor @AllArgsConstructor
 @Data
+@Builder
 @Table(name = "promotions")
 public class Promotion {
 

@@ -4,13 +4,14 @@ import com.app.pos.system.model.enums.PromoType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
-@Data
-public class CreatePromotionRequest {
+@Getter @Setter
+public class UpdatePromotionRequest {
 
     @NotBlank(message = "Field 'name' is required")
     @Size(max = 200, message = "Promotion name cannot exceed 200 characters")
@@ -28,6 +29,4 @@ public class CreatePromotionRequest {
     @NotNull(message = "Field 'endsAt' is required")
     private OffsetDateTime endsAt;
 
-    @NotBlank(message = "Field 'active' is required")
-    private Boolean active;
 }
