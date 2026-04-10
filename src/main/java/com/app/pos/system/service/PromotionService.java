@@ -146,7 +146,7 @@ public class PromotionService {
         promotionProductRepo.saveAll(toSave);
     }
 
-    
+
     @Transactional
     public void togglePromotionActive(Long promotionId, Boolean active){
         Promotion promotion = promotionRepository.findById(promotionId)
@@ -160,12 +160,37 @@ public class PromotionService {
             Long id = promotionProductRepo.getConflictingProductId(promotionId);
 
             if(id != null){
-                throw new BadRequestException("BAD_REQUEST", "Product with id " + id + " has another active promotion");
+                throw new BadRequestException(
+                        "BAD_REQUEST",
+                        "Couldn't activate. Product with id " + id + " has another active promotion"
+                );
             }
         }
 
         promotion.setActive(active);
         promotionRepository.save(promotion);
+    }
+
+
+    public void togglePromotionProductActive(Long promotionId, Long productId, Boolean active){
+
+        Promotion promotion = promotionRepository.findById(promotionId)
+                .orElseThrow(() -> new NotFoundException("PROMOTION_NOT_FOUND",
+                        "Promotion with id " + promotionId + " not found"));
+
+
+        PromotionProduct promotionProduct = promotionProductRepo
+                .findById(new PromotionProductId(promotionId, productId))
+                .orElseThrow(() -> new NotFoundException("PROMOTION_PRODUCT_NOT_FOUND",
+                        "Product with id " + productId + " not found in promotion"));
+
+
+        if(active == true && promotion.getActive() && promotionProductRepo.existsActivePromotionProduct(productId)){
+            throw new BadRequestException("BAD_REQUEST", "Product with id " + productId + " has another active promotion");
+        }
+
+        promotionProduct.setActive(active);
+        promotionProductRepo.save(promotionProduct);
     }
 
 }

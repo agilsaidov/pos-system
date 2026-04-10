@@ -78,4 +78,16 @@ public interface PromotionProductRepo extends JpaRepository<PromotionProduct, Pr
     Long getConflictingProductId(@Param("promotionId") Long promotionId);
 
 
+    @Query(value = """
+            SELECT EXISTS(
+            SELECT 1
+            FROM promotion_products as pp
+            JOIN promotions as pr
+            ON pp.promotion_id = pr.id
+            WHERE pp.product_id=:productId
+                AND pp.active = true
+                AND pr.active = true
+    );
+    """, nativeQuery = true)
+    boolean existsActivePromotionProduct(@Param("productId") Long productId);
 }

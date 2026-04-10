@@ -78,5 +78,15 @@ public class PromotionController {
         promotionService.togglePromotionActive(promotionId, active);
         return ResponseEntity.noContent().build();
     }
+
+
+    @PatchMapping("/{promotionId}/products/{productId}/activate/{active}")
+    public ResponseEntity<Void> togglePromotionProductActive(@PathVariable Long promotionId,
+                                                             @PathVariable Long productId,
+                                                             @PathVariable Boolean active){
+
+        promotionService.togglePromotionProductActive(promotionId, productId, active);
+        return ResponseEntity.noContent().build();
+    }
     
 }
