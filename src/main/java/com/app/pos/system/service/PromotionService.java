@@ -84,7 +84,7 @@ public class PromotionService {
         PromotionWithProductsResponse response = promotionMapper.toPromotionWithProductsResponse(promotion);
 
         response.setPromotionProducts(promotionProducts.stream()
-                .map(pp -> promotionMapper.toProductResponse(pp.getProduct()))
+                .map(promotionMapper::toPromotionProductResponse)
                 .toList());
 
         return response;
@@ -121,6 +121,7 @@ public class PromotionService {
     }
 
 
+    @Transactional
     public void addProductsToPromotion(Long promotionId, AddProductsToPromotionRequest request){
         Promotion promotion = promotionRepository.findById(promotionId)
                 .orElseThrow(() -> new NotFoundException("PROMOTION_NOT_FOUND", "Promotion with id " + promotionId + " not found"));
@@ -139,12 +140,13 @@ public class PromotionService {
 
             toSave.add(new PromotionProduct(
                             new PromotionProductId(promotionId, productId),
-                            product, promotion));
+                            product, promotion, OffsetDateTime.now(), true));
         }
 
         promotionProductRepo.saveAll(toSave);
     }
 
+    
     @Transactional
     public void togglePromotionActive(Long promotionId, Boolean active){
         Promotion promotion = promotionRepository.findById(promotionId)

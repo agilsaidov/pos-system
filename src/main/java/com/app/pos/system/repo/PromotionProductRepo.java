@@ -20,6 +20,7 @@ public interface PromotionProductRepo extends JpaRepository<PromotionProduct, Pr
         JOIN promotions p ON pp.promotion_id = p.id
         WHERE pp.product_id = :productId
         AND p.active = true
+        AND pp.active=true
         AND p.starts_at <= :now
         AND p.ends_at >= :now
         LIMIT 1
@@ -33,7 +34,7 @@ public interface PromotionProductRepo extends JpaRepository<PromotionProduct, Pr
     @Query(value = """
         SELECT pp.* FROM promotion_products pp
         JOIN promotions p ON pp.promotion_id = p.id
-        WHERE pp.product_id = :productId
+        WHERE pp.product_id = :productId AND pp.active=true
         """, nativeQuery = true)
     Page<PromotionProduct> findAllByProductId(@Param("productId") Long productId, Pageable pageable);
 
@@ -51,7 +52,9 @@ public interface PromotionProductRepo extends JpaRepository<PromotionProduct, Pr
                             SELECT p.active FROM promotions as p
                             JOIN promotion_products as pp 
                             ON pp.promotion_id = p.id
-                            WHERE pp.product_id=:productId AND p.active=true                       
+                            WHERE pp.product_id=:productId 
+                            AND p.active=true        
+                            AND pp.active=true            
                         );
             """, nativeQuery = true)
     boolean existsActivePromotionByProductId(@Param("productId") Long productId);
@@ -67,6 +70,8 @@ public interface PromotionProductRepo extends JpaRepository<PromotionProduct, Pr
           JOIN promotions pr ON other.promotion_id = pr.id
           WHERE other.product_id = pp.product_id
             AND pr.active = true
+            AND other.active = true
+            AND pp.active = true
             AND pr.id <> :promotionId
       )
     """, nativeQuery = true)

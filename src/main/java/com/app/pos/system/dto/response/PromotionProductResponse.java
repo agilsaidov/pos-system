@@ -9,4 +9,5 @@ public class PromotionProductResponse {
     private Long productId;
     private String productName;
     private String barcode;
+    private String active;
 }
