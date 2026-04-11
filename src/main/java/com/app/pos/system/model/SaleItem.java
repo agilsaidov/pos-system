@@ -2,6 +2,7 @@ package com.app.pos.system.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +12,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor @AllArgsConstructor
 @Data
 @Table(name = "sale_items")
+@Builder
 public class SaleItem {
 
     @Id
@@ -25,6 +27,10 @@ public class SaleItem {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "product_id")
     private Product product;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "promotion_id")
+    private Promotion appliedPromotion;
 
     @Column(name = "quantity", nullable = false)
     private int quantity;

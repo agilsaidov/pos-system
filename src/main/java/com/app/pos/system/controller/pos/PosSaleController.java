@@ -1,14 +1,15 @@
 package com.app.pos.system.controller.pos;
 
+import com.app.pos.system.dto.request.CheckoutRequest;
+import com.app.pos.system.dto.response.CheckoutResponse;
 import com.app.pos.system.dto.response.SaleResponse;
 import com.app.pos.system.service.SaleService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.OffsetDateTime;
 
@@ -29,5 +30,12 @@ public class PosSaleController {
 
         return ResponseEntity.ok().body(saleService.getSalesForCashier(saleId, storeId, from, to, page, size));
 
+    }
+
+
+    @PostMapping("/checkout")
+    public ResponseEntity<CheckoutResponse> checkout(@RequestBody @Valid CheckoutRequest request) {
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(saleService.checkout(request));
     }
 }

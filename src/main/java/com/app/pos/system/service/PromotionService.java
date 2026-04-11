@@ -13,6 +13,7 @@ import com.app.pos.system.model.Product;
 import com.app.pos.system.model.Promotion;
 import com.app.pos.system.model.PromotionProduct;
 import com.app.pos.system.model.PromotionProductId;
+import com.app.pos.system.model.enums.PromoType;
 import com.app.pos.system.repo.ProductRepository;
 import com.app.pos.system.repo.PromotionProductRepo;
 import com.app.pos.system.repo.PromotionRepository;
@@ -25,9 +26,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -39,18 +44,48 @@ public class PromotionService {
 
     private final PromotionMapper promotionMapper;
 
-    public BigDecimal getActiveDiscount(Long productId, BigDecimal price) {
-        return promotionProductRepo
-                .findActivePromotionForProduct(productId, OffsetDateTime.now())
+    public BigDecimal getActiveDiscount(Optional<PromotionProduct> promotionProduct, BigDecimal price) {
+        return promotionProduct
                 .map(pp -> calculateDiscount(pp.getPromotion(), price))
                 .orElse(BigDecimal.ZERO);
     }
+
+    public BigDecimal calculateDiscountValue(BigDecimal unitPrice, int quantity, Promotion promotion) {
+        if (promotion == null) {
+            return BigDecimal.ZERO;
+        }
+
+        BigDecimal totalDiscount;
+        if (promotion.getType() == PromoType.PERCENTAGE) {
+            // (Price * Qty) * (Percentage / 100)
+            BigDecimal gross = unitPrice.multiply(BigDecimal.valueOf(quantity));
+            totalDiscount = gross.multiply(promotion.getValue())
+                    .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+        } else {
+            // Fixed amount per unit * Qty
+            totalDiscount = promotion.getValue().multiply(BigDecimal.valueOf(quantity));
+        }
+
+        return totalDiscount.setScale(2, RoundingMode.HALF_UP);
+    }
+
 
     private BigDecimal calculateDiscount(Promotion promotion, BigDecimal price) {
         return switch (promotion.getType()) {
             case PERCENTAGE -> price.multiply(promotion.getValue());
             case FIXED_AMOUNT -> promotion.getValue();
         };
+    }
+
+
+    public Map<Long, Promotion> getActivePromotionsForProducts(List<Long> productIds) {
+        OffsetDateTime now = OffsetDateTime.now();
+        return promotionProductRepo.findAllActiveByProductIds(productIds, now)
+                .stream()
+                .collect(Collectors.toMap(
+                        pp -> pp.getProduct().getProductId(),
+                        PromotionProduct::getPromotion
+                ));
     }
 
 
@@ -171,7 +206,7 @@ public class PromotionService {
         promotionRepository.save(promotion);
     }
 
-
+    @Transactional
     public void togglePromotionProductActive(Long promotionId, Long productId, Boolean active){
 
         Promotion promotion = promotionRepository.findById(promotionId)

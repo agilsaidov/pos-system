@@ -1,5 +1,14 @@
 package com.app.pos.system.dto.request;
 
+import com.app.pos.system.model.enums.PaymentMethod;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+
+import java.math.BigDecimal;
+import java.util.List;
+
 @Getter
 public class CheckoutRequest {
 

@@ -1,5 +1,11 @@
 package com.app.pos.system.dto.request;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+
+import java.math.BigDecimal;
+
 @Getter
 public class CheckoutItemRequest {
 
@@ -12,5 +18,5 @@ public class CheckoutItemRequest {
 
     private BigDecimal discountAmount = BigDecimal.ZERO;
 
-    private Long promotionId; // nullable
+    private Long promotionId;
 }

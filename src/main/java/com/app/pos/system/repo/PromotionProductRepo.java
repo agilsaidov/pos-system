@@ -30,6 +30,19 @@ public interface PromotionProductRepo extends JpaRepository<PromotionProduct, Pr
 
 
 
+    @Query("SELECT pp FROM PromotionProduct pp " +
+            "JOIN FETCH pp.promotion p " +
+            "WHERE pp.product.productId IN :productIds " +
+            "AND pp.active = true " +
+            "AND p.active = true " +
+            "AND p.startsAt <= :now " +
+            "AND p.endsAt >= :now")
+    List<PromotionProduct> findAllActiveByProductIds(
+            @Param("productIds") List<Long> productIds,
+            @Param("now") OffsetDateTime now);
+
+
+
     @Query(value = """
         SELECT pp.* FROM promotion_products pp
         JOIN promotions p ON pp.promotion_id = p.id

@@ -1,4 +1,7 @@
 package com.app.pos.system.repo;
 
-public interface SaleItemRepository {
+import com.app.pos.system.model.SaleItem;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface SaleItemRepository extends JpaRepository<SaleItem, Long> {
 }

@@ -3,8 +3,11 @@ package com.app.pos.system.model;
 import com.app.pos.system.model.enums.SaleStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.type.PostgreSQLEnumJdbcType;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -13,6 +16,7 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor @AllArgsConstructor
 @Data
 @Table(name = "sales")
+@Builder
 public class Sale {
 
     @Id
@@ -43,7 +47,7 @@ public class Sale {
     @Column(name = "total", nullable = false, precision = 12, scale = 2)
     private BigDecimal total;
 
-    @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(name = "status", nullable = false)
     private SaleStatus status = SaleStatus.PENDING;
 

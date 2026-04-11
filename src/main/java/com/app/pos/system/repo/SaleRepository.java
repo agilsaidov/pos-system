@@ -82,4 +82,7 @@ public interface SaleRepository extends JpaRepository<Sale, Long>, JpaSpecificat
     DailyReportProjection getDailyReport(@Param("storeId") Long storeId, @Param("date") LocalDate date);
 
     Page<Sale> findAll(Specification<Sale> saleSpecification, Pageable pageable);
+
+    @Query(value = "SELECT nextval('receipt_no_seq')", nativeQuery = true)
+    Long getNextReceiptNo();
 }

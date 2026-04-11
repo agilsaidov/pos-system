@@ -1,0 +1,1 @@
+CREATE SEQUENCE receipt_no_seq START 1;

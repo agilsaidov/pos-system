@@ -1,6 +1,15 @@
 package com.app.pos.system.dto.response;
 
-@Getter @Setter
+import com.app.pos.system.model.enums.PaymentMethod;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import java.util.List;
+
+@Getter
+@Setter
 public class CheckoutResponse {
     private Long saleId;
     private String receiptNo;
