@@ -8,7 +8,11 @@ import com.app.pos.system.exception.DuplicateException;
 import com.app.pos.system.exception.NotFoundException;
 import com.app.pos.system.mapper.ProductMapper;
 import com.app.pos.system.model.Product;
+import com.app.pos.system.model.Promotion;
+import com.app.pos.system.model.PromotionProduct;
 import com.app.pos.system.repo.ProductRepository;
+import com.app.pos.system.repo.PromotionProductRepo;
+import com.app.pos.system.repo.PromotionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -17,7 +21,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +32,7 @@ public class ProductService {
     private final ProductRepository productRepo;
     private final ProductMapper productMapper;
     private final PromotionService promotionService;
+    private final PromotionProductRepo promotionProductRepo;
 
     public ProductLookupResponse lookup(String barcode){
         Product product = productRepo.findByBarcode(barcode)
@@ -41,10 +48,18 @@ public class ProductService {
             );
         }
 
-        BigDecimal discountAmount =  promotionService.getActiveDiscount(product.getProductId(), product.getPrice());
+        Optional<PromotionProduct> promotionProduct = promotionProductRepo
+                .findActivePromotionForProduct(product.getProductId(), OffsetDateTime.now());
+
+        BigDecimal discountAmount =  promotionService.getActiveDiscount(promotionProduct, product.getPrice());
         BigDecimal finalPrice = product.getPrice().subtract(discountAmount);
 
         ProductLookupResponse response = productMapper.toLookupResponse(product);
+
+        if(promotionProduct.isPresent()) {
+            response.setPromotionId(promotionProduct.get().getPromotion().getPromotionId());
+            response.setPromotionName(promotionProduct.get().getPromotion().getName());
+        }
         response.setDiscountAmount(discountAmount);
         response.setFinalPrice(finalPrice);
 

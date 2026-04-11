@@ -15,16 +15,15 @@ import java.util.Optional;
 public interface PromotionProductRepo extends JpaRepository<PromotionProduct, PromotionProductId> {
 
 
-    @Query(value = """
-        SELECT pp.* FROM promotion_products pp
-        JOIN promotions p ON pp.promotion_id = p.id
-        WHERE pp.product_id = :productId
-        AND p.active = true
-        AND pp.active=true
-        AND p.starts_at <= :now
-        AND p.ends_at >= :now
-        LIMIT 1
-        """, nativeQuery = true)
+    @Query("""
+        SELECT pp FROM PromotionProduct pp
+        JOIN FETCH pp.promotion p 
+        WHERE pp.product.productId = :productId 
+        AND pp.active = true 
+        AND p.active = true 
+        AND p.startsAt <= :now 
+        AND p.endsAt >= :now
+    """)
     Optional<PromotionProduct> findActivePromotionForProduct(
             @Param("productId") Long productId,
             @Param("now") OffsetDateTime now);

@@ -12,4 +12,6 @@ public class ProductLookupResponse {
     private BigDecimal taxRate;
     private BigDecimal discountAmount;
     private BigDecimal finalPrice;
+    private Long promotionId;
+    private String promotionName;
 }
