@@ -56,4 +56,8 @@ public interface StoreAssignmentRepository extends JpaRepository<StoreAssignment
         AND r.name = 'CASHIER'        
         """, nativeQuery = true)
     CashierDetailsProjection getByUserIdAndStoreId(@Param("cashierId") Long cashierId, @Param("storeId") Long storeId);
+
+
+    @Query(value = "SELECT COUNT(*) FROM store_assignments WHERE store_id = :storeId", nativeQuery = true)
+    Integer countStaff(@Param("storeId") Long storeId);
 }
