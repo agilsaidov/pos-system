@@ -44,8 +44,8 @@ public class AdminUserController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PutMapping
-    public ResponseEntity<UserResponse> updateUser(@RequestParam Long userId,
+    @PutMapping("/{id}")
+    public ResponseEntity<UserResponse> updateUser(@PathVariable("id") Long userId,
                                                    @RequestBody UpdateUserRequest request){
         return ResponseEntity.ok().body(adminUserManagementService.updateUser(userId, request));
     }

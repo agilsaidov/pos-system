@@ -68,22 +68,22 @@ public class PromotionController {
     public ResponseEntity<Void> addProducts(@PathVariable Long promotionId,
                                             @RequestBody @Valid AddProductsToPromotionRequest request){
         promotionService.addProductsToPromotion(promotionId, request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
 
-    @PatchMapping("/{id}/activate/{active}")
-    public ResponseEntity<Void> togglePromotionActive(@PathVariable Boolean active,
+    @PatchMapping("/{id}/activate")
+    public ResponseEntity<Void> togglePromotionActive(@RequestParam Boolean active,
                                                       @PathVariable(name = "id") Long promotionId){
         promotionService.togglePromotionActive(promotionId, active);
         return ResponseEntity.noContent().build();
     }
 
 
-    @PatchMapping("/{promotionId}/products/{productId}/activate/{active}")
+    @PatchMapping("/{promotionId}/products/{productId}/activate")
     public ResponseEntity<Void> togglePromotionProductActive(@PathVariable Long promotionId,
                                                              @PathVariable Long productId,
-                                                             @PathVariable Boolean active){
+                                                             @RequestParam Boolean active){
 
         promotionService.togglePromotionProductActive(promotionId, productId, active);
         return ResponseEntity.noContent().build();
