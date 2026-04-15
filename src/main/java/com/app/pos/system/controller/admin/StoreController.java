@@ -1,7 +1,6 @@
 package com.app.pos.system.controller.admin;
 
-import com.app.pos.system.dto.request.CreatePromotionRequest;
-import com.app.pos.system.dto.request.CreateStoreRequest;
+import com.app.pos.system.dto.request.StoreRequest;
 import com.app.pos.system.dto.response.StoreDetailResponse;
 import com.app.pos.system.dto.response.StoreResponse;
 import com.app.pos.system.service.StoreService;
@@ -40,8 +39,24 @@ public class StoreController {
         return ResponseEntity.ok().body(storeService.getStoreDetails(storeId));
     }
 
+
     @PutMapping
-    public ResponseEntity<StoreDetailResponse> createStore(@RequestBody CreateStoreRequest request){
+    public ResponseEntity<StoreDetailResponse> createStore(@RequestBody StoreRequest request){
         return ResponseEntity.status(HttpStatus.CREATED).body(storeService.createStore(request));
+    }
+
+
+    @PatchMapping("/{id}/activate")
+    public ResponseEntity<Void> toggleStoreActive(@RequestParam Boolean active,
+                                                  @PathVariable("id") Long storeId){
+        storeService.toggleStoreActive(storeId, active);
+        return ResponseEntity.noContent().build();
+    }
+
+
+    @PostMapping("/{id}")
+    public ResponseEntity<StoreDetailResponse> updateStore(@PathVariable("id") Long storeId,
+                                                           @RequestBody StoreRequest request){
+        return ResponseEntity.ok().body(storeService.updateStore(storeId, request));
     }
 }

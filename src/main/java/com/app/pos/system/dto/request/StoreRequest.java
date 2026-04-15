@@ -9,7 +9,7 @@ import lombok.Setter;
 import java.time.OffsetDateTime;
 
 @Getter @Setter
-public class CreateStoreRequest {
+public class StoreRequest {
 
     @NotBlank(message = "Field 'name' is required")
     @Size(max = 200, message = "'name' cannot exceed 200 characters")
