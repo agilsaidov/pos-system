@@ -2,6 +2,7 @@ package com.app.pos.system.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +12,7 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor @NoArgsConstructor
 @Data
 @Table(name = "stores")
+@Builder
 public class Store {
     @Id
     @Column(name = "id")
@@ -30,12 +32,23 @@ public class Store {
     private String phone;
 
     @Column(name = "active", nullable = false)
-    private Boolean active = true;
+    private Boolean active;
 
     @Column(name = "opened_at", nullable = false)
     private OffsetDateTime openedAt;
 
     @Column(name = "created_at", nullable = false)
-    private OffsetDateTime createdAt = OffsetDateTime.now();
+    private OffsetDateTime createdAt;
+
+
+    @PrePersist
+    protected void onCreate() {
+        if (active == null) {
+            active = true;
+        }
+        if (createdAt == null) {
+            createdAt = OffsetDateTime.now();
+        }
+    }
 
 }

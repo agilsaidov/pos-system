@@ -1,10 +1,13 @@
 package com.app.pos.system.controller.admin;
 
+import com.app.pos.system.dto.request.CreatePromotionRequest;
+import com.app.pos.system.dto.request.CreateStoreRequest;
 import com.app.pos.system.dto.response.StoreDetailResponse;
 import com.app.pos.system.dto.response.StoreResponse;
 import com.app.pos.system.service.StoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,5 +38,10 @@ public class StoreController {
     @GetMapping("/{id}/details")
     public ResponseEntity<StoreDetailResponse> getStoreDetails(@PathVariable("id") Long storeId){
         return ResponseEntity.ok().body(storeService.getStoreDetails(storeId));
+    }
+
+    @PutMapping
+    public ResponseEntity<StoreDetailResponse> createStore(@RequestBody CreateStoreRequest request){
+        return ResponseEntity.status(HttpStatus.CREATED).body(storeService.createStore(request));
     }
 }

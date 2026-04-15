@@ -1,5 +1,6 @@
 package com.app.pos.system.service;
 
+import com.app.pos.system.dto.request.CreateStoreRequest;
 import com.app.pos.system.dto.response.StoreDetailResponse;
 import com.app.pos.system.dto.response.StoreResponse;
 import com.app.pos.system.exception.NotFoundException;
@@ -13,8 +14,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 
 @Service
@@ -54,6 +53,24 @@ public class StoreService {
 
         StoreDetailResponse response = storeMapper.toStoreDetailResponse(store);
         response.setTotalStaff(numberOfStaff);
+
+        return response;
+    }
+
+
+    public StoreDetailResponse createStore(CreateStoreRequest request){
+        Store store = Store.builder()
+                        .name(request.getName())
+                        .city(request.getCity())
+                        .address(request.getAddress())
+                        .phone(request.getPhone())
+                        .openedAt(request.getOpenedAt())
+                        .build();
+
+        Store savedStore = storeRepository.save(store);
+
+        StoreDetailResponse response = storeMapper.toStoreDetailResponse(savedStore);
+        response.setTotalStaff(storeAssignmentRepository.countStaff(savedStore.getStoreId()));
 
         return response;
     }
