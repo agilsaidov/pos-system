@@ -3,18 +3,25 @@ package com.app.pos.system.service;
 import com.app.pos.system.dto.request.StoreRequest;
 import com.app.pos.system.dto.response.StoreDetailResponse;
 import com.app.pos.system.dto.response.StoreResponse;
+import com.app.pos.system.exception.AccessDeniedException;
 import com.app.pos.system.exception.BadRequestException;
 import com.app.pos.system.exception.NotFoundException;
 import com.app.pos.system.mapper.StoreMapper;
 import com.app.pos.system.model.Store;
+import com.app.pos.system.model.StoreAssignmentId;
+import com.app.pos.system.model.User;
 import com.app.pos.system.repo.StoreAssignmentRepository;
 import com.app.pos.system.repo.StoreRepository;
+import com.app.pos.system.repo.UserRepository;
 import com.app.pos.system.specification.StoreSpec;
+import com.app.pos.system.utils.AuthUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 
 @Service
@@ -24,6 +31,8 @@ public class StoreService {
     private final StoreRepository storeRepository;
     private final StoreMapper storeMapper;
     private final StoreAssignmentRepository storeAssignmentRepository;
+    private final AuthUtils authUtils;
+    private final UserRepository userRepository;
 
     public Page<StoreResponse> getStores(String name, String city, String address, int page, int size) {
 
@@ -40,6 +49,8 @@ public class StoreService {
                                 "STORE_NOT_FOUND",
                                 "Store with id " + storeId + " not found"));
 
+        validateStoreAccess(store);
+
         return storeMapper.toStoreResponse(store);
     }
 
@@ -49,6 +60,8 @@ public class StoreService {
                         () -> new NotFoundException(
                                 "STORE_NOT_FOUND",
                                 "Store with id " + storeId + " not found"));
+
+        validateStoreAccess(store);
 
         Integer numberOfStaff = storeAssignmentRepository.countStaff(storeId);
 
@@ -107,5 +120,22 @@ public class StoreService {
         store.setOpenedAt(request.getOpenedAt());
 
         return storeMapper.toStoreDetailResponse(storeRepository.save(store));
+    }
+
+
+    private void validateStoreAccess(Store store) {
+
+        UUID keycloakId = authUtils.getCurrentUserKeycloakId();
+        User currentUser = userRepository.findByKeycloakId(keycloakId)
+                .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND", "User not found"));
+
+        if (!authUtils.isAdmin()) {
+            boolean isAssigned = storeAssignmentRepository
+                    .existsById(new StoreAssignmentId(currentUser.getUserId(), store.getStoreId()));
+
+            if (!isAssigned) {
+                throw new AccessDeniedException("You do not have permission to access this store.");
+            }
+        }
     }
 }
