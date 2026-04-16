@@ -2,9 +2,11 @@ package com.app.pos.system.service;
 
 import com.app.pos.system.dto.response.CashierDetailsResponse;
 import com.app.pos.system.exception.AccessDeniedException;
+import com.app.pos.system.exception.BadRequestException;
 import com.app.pos.system.exception.DuplicateException;
 import com.app.pos.system.exception.NotFoundException;
 import com.app.pos.system.mapper.UserMapper;
+import com.app.pos.system.model.Store;
 import com.app.pos.system.model.StoreAssignment;
 import com.app.pos.system.model.StoreAssignmentId;
 import com.app.pos.system.model.User;
@@ -32,7 +34,11 @@ public class UserManagementService {
 
     public List<CashierDetailsResponse> getCashiers(Long storeId){
 
-        validateStoreAccess(storeId);
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new NotFoundException(
+                        "STORE_NOT_FOUND", "Store with id " + storeId + " not found"));
+
+        validateStoreAccess(store.getStoreId());
 
         return storeAssignmentRepository.findAllByStoreId(storeId)
                 .stream().map(userMapper::toCashierDetailsResponse)
@@ -42,7 +48,11 @@ public class UserManagementService {
 
     public CashierDetailsResponse getCashier(Long cashierId, Long storeId){
 
-        validateStoreAccess(storeId);
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new NotFoundException(
+                        "STORE_NOT_FOUND", "Store with id " + storeId + " not found"));
+
+        validateStoreAccess(store.getStoreId());
 
         if(!userRepository.existsById(cashierId)){
             throw new NotFoundException("CASHIER_NOT_FOUND", "Cashier with id " + cashierId + " not found");
@@ -60,6 +70,7 @@ public class UserManagementService {
     @Transactional
     public void assignCashierToStore(Long cashierId, Long storeId){
 
+        validateStoreActivity(storeId);
         validateStoreAccess(storeId);
 
         if(!userRepository.existsById(cashierId)){
@@ -81,6 +92,7 @@ public class UserManagementService {
     @Transactional
     public void unAssignCashierFromStore(Long cashierId, Long storeId){
 
+        validateStoreActivity(storeId);
         validateStoreAccess(storeId);
 
         if(!userRepository.existsById(cashierId)){
@@ -96,10 +108,6 @@ public class UserManagementService {
 
 
     private void validateStoreAccess(Long storeId) {
-        if (!storeRepository.existsById(storeId)) {
-            throw new NotFoundException("STORE_NOT_FOUND", "Store with id " + storeId + " not found");
-        }
-
         if(authUtils.isManager()) {
             UUID keycloakId = authUtils.getCurrentUserKeycloakId();
             User manager = userRepository.findByKeycloakId(keycloakId)
@@ -110,5 +118,18 @@ public class UserManagementService {
                 throw new AccessDeniedException("Manager with id " + manager.getUserId() + " does not have access to store " + storeId);
             }
         }
+    }
+
+
+    private Store validateStoreActivity(Long storeId){
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new NotFoundException(
+                        "STORE_NOT_FOUND", "Store with id " + storeId + " not found"));
+
+        if(!store.getActive()){
+            throw new BadRequestException("STORE_INACTIVE", "Store is not active");
+        }
+
+        return store;
     }
 }

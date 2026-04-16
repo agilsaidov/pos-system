@@ -42,7 +42,11 @@ public class StockMovementService {
                                                         int page, int size){
 
         if(storeId != null){
-            validateStoreAccess(storeId);
+            Store store = storeRepository.findById(storeId)
+                            .orElseThrow(() -> new NotFoundException(
+                                    "STORE_NOT_FOUND", "Store with id " + storeId + " not found"));
+
+            validateStoreAccess(store);
 
         }else if(authUtils.isManager()){
             throw new BadRequestException("STORE_ID_REQUIRED", "Managers must specify a storeId");
@@ -60,7 +64,15 @@ public class StockMovementService {
     @Transactional
     public StockMovementResponse createStockMovement(StockMovementRequest request){
 
-        User currentUser = validateStoreAccess(request.getStoreId());
+        Store store = storeRepository.findById(request.getStoreId())
+                .orElseThrow(() -> new NotFoundException(
+                        "STORE_NOT_FOUND", "Store with id " + request.getStoreId() + " not found"));
+
+        if(!store.getActive()){
+            throw new BadRequestException("STORE_INACTIVE", "Store is not active");
+        }
+
+        User currentUser = validateStoreAccess(store);
 
         if (request.getType() == StockMovementType.SALE ||
                 request.getType() == StockMovementType.RETURN) {
@@ -110,10 +122,7 @@ public class StockMovementService {
     }
 
 
-    private User validateStoreAccess(Long storeId) {
-        if (!storeRepository.existsById(storeId)) {
-            throw new NotFoundException("STORE_NOT_FOUND", "Store not found");
-        }
+    private User validateStoreAccess(Store store) {
 
         UUID keycloakId = authUtils.getCurrentUserKeycloakId();
         User currentUser = userRepository.findByKeycloakId(keycloakId)
@@ -121,7 +130,7 @@ public class StockMovementService {
 
         if (!authUtils.isAdmin()) {
             boolean isAssigned = storeAssignmentRepository
-                    .existsById(new StoreAssignmentId(currentUser.getUserId(), storeId));
+                    .existsById(new StoreAssignmentId(currentUser.getUserId(), store.getStoreId()));
 
             if (!isAssigned) {
                 throw new AccessDeniedException("You do not have permission to access this store.");

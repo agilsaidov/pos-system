@@ -57,6 +57,10 @@ public class SaleService {
         Store store = storeRepository.findById(request.getStoreId())
                 .orElseThrow(() -> new NotFoundException("STORE_NOT_FOUND", "Store not found"));
 
+        if(!store.getActive()){
+            throw new BadRequestException("STORE_INACTIVE", "Store is not active");
+        }
+
         if (!storeAssignmentRepository.existsById(new StoreAssignmentId(cashier.getUserId(), store.getStoreId()))) {
             throw new AccessDeniedException("Cashier is not assigned to this store");
         }
